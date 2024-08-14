@@ -1,0 +1,32 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif !important;
+}
+
+.title {
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+}
+
+.findBtn{
+    // background-color: #058dbb !important;
+    background: linear-gradient(to bottom, #30AFDC 0%, #0672BC 100%);
+    color: #fff !important;
+    padding: 5px 30px !important;
+}
+
+.card{
+    // border: 2px solid blue;
+    width: 100%;
+    // margin: 10px 35px;
+}
+
+.dateTimeKey{
+    font-weight: 700;
+}
+
+.score{
+    font-weight: 600 !important;
+}

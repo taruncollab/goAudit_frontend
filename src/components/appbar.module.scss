@@ -1,0 +1,119 @@
+.appbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background-color: #fff;
+
+    .appbar_left {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+
+        .menu{
+            margin-left: 0.9rem;
+            img{
+                width: 2rem;
+            }
+        }
+    }
+
+    .appbar_right {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        .noti{
+            // background: linear-gradient(#0672BC #30AFDC);
+            background: linear-gradient(to bottom, #0672BC 0%, #30AFDC 100%);
+        }
+        .noti img{
+            width: 1.5rem;
+            padding: 0 3px;
+        }
+        
+        .profile{
+            background-color: #E2E2E2;
+            margin: 0 0 0 1.5rem;
+            border-radius: 30px;
+            padding: 1 !important;
+            box-shadow: none !important;
+            // border: 2px solid #0672BC;
+        }
+        .profile img{
+            width: 2rem;
+            // border: 2px solid #0672BC;
+            // border-radius: 50%;
+        }
+
+        .profile:hover{
+            background-color: #E2E2E2;
+            margin: 0 0 0 1.5rem;
+            border-radius: 30px;
+            padding: 1 !important;
+            // border: 2px solid #0672BC;
+            box-shadow: none !important;
+        }
+        
+        .btnText{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0rem 2rem;
+            .btnTextName{
+                color: #000;
+                font-size: 14px;
+                margin-bottom: 0;
+            }
+            .btnTextRole{
+                color: #4A4A4A;
+                font-size: 11px;
+                margin-top: 0;
+            }
+        }
+        .arrow{
+            color: #0672BC;
+
+        }
+    }
+}
+
+
+// ================================================================================================
+.menus{
+    border-top-right-radius: 25px !important;
+    border-bottom-right-radius: 25px !important;
+    padding: 0px 0 !important;
+    margin: 15px 0px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    color: #000;
+}
+.active{
+    background: linear-gradient(to bottom, #30AFDC 0%, #0672BC 100%);
+    border-top-right-radius: 25px !important;
+    border-bottom-right-radius: 25px !important;
+    padding: 0px 0 !important;
+    margin: 15px 0px;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    color: #fff;
+}
+
+.icons{
+    width: 1.4rem;
+    margin-left: 10px;
+}
+
+.menuIcon{
+    color: #000;
+    margin-left: 15px;
+}
+.activeIcon{
+    color: #fff;
+    margin-left: 15px;
+}
+

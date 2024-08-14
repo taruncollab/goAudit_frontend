@@ -1,0 +1,85 @@
+.mainBox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed #058dbb;
+
+    .head {
+        font-size: 1.5rem;
+        font-weight: 700 !important;
+        margin: 10px 0;
+    }
+
+    .closeIcon {
+        cursor: pointer;
+        width: 2rem;
+    }
+
+}
+
+
+.imgCover {
+    height: 120px;
+    width: 100px;
+
+    img {
+        width: 100%;
+
+    }
+}
+
+.imgTit {
+    font-size: 16px;
+    font-weight: 600 !important;
+}
+
+.addBtn {
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    border: 1px solid #058dbb !important;
+    height: 140px !important;
+    width: 120px !important;
+    background-color: #fff !important;
+    box-shadow: none !important;
+
+    .btnInner{
+        .icon{
+            color: #058dbb;
+            font-size: 40px;
+            border: 3px solid #058dbb;
+            border-radius: 20px;
+        }
+        .btnText{
+            color: #058dbb;
+        }
+    }
+}
+.note{
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.clearBtn{
+    font-size: 16px !important;
+    border: 1px solid #000 !important;
+    background-color: #fff !important;
+    color: #000 !important;
+    font-weight: 600 !important;
+}
+.clearBtn:hover{
+    border: 1px solid #000;
+    background-color: #000 !important;
+    color: #fff !important;
+}
+.submitBtn{
+    font-size: 16px !important;
+    border: 1px solid #00405B !important;
+    background-color: #00405B !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+}
+.submitBtn:hover{
+    border: 1px solid #00405B !important;
+    background-color: #fff !important;
+    color: #00405B !important;
+}

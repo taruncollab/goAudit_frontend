@@ -1,0 +1,190 @@
+* {
+    font-family: "Poppins", sans-serif;
+}
+
+.title {
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+}
+
+.card {
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.tabs {
+    color: #058dbb !important;
+    // color: #03607E !important;
+    border-radius: 25px !important;
+    font-weight: 500 !important;
+    padding: 5px 20px !important;
+
+}
+.addBtn {
+    background: linear-gradient(to bottom, #30AFDC 0%, #0672BC 100%);
+    box-shadow: none !important;
+    border-radius: 25px !important;
+    padding: 5px 25px !important;
+    // font-size: 18px !important;
+    font-weight: bold !important;
+    color: #fff;
+}
+
+.activeTabs {
+    background: linear-gradient(to bottom, #30AFDC 0%, #0672BC 100%);
+    color: #fff !important;
+    border-radius: 25px !important;
+    // font-size: 18px !important;
+    font-weight: 500 !important;
+    padding: 5px 20px !important;
+}
+
+.addCard {
+    width: 10rem !important;
+    height: 11rem !important;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0px 0px 15px 0px rgba(156, 156, 156, 0.52) !important;
+}
+
+.accordian {
+    background-color: #fff;
+    // border: 1px solid green;
+    border: 1px solid #fff;
+    border-radius: 5px !important;
+    -webkit-box-shadow: 0px 0px 5px 5px rgba(156, 156, 156, 0.52) !important;
+    -moz-box-shadow: 0px 0px 5px 5px rgba(156, 156, 156, 0.52) !important;
+    box-shadow: 0px 0px 15px 0px rgba(156, 156, 156, 0.52) !important;
+
+
+    .accordionSummary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center !important;
+        // margin-bottom: 0 !important;
+        border-radius: 5px !important;
+        // box-shadow: 0px 0px 10px 5px rgba(156, 156, 156, 0.52) !important;
+        // border: 1px solid green;
+        // margin-top: 10px !important;
+
+        .summaryLeft {
+            flex: 1;
+
+            .txt1 {
+                font-weight: 800 !important;
+            }
+
+            .txt2 {
+                font-weight: 800 !important;
+                color: #058dbb;
+            }
+
+            .txt3 {
+                font-weight: 800 !important;
+                color: #00B232;
+            }
+
+            .txt4 {
+                font-weight: 800 !important;
+                color: #F77E09;
+            }
+        }
+
+        .summaryRight {
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    .accordianDetail {
+        background-color: #d9d9d9;
+
+        .compLogo {
+            width: 6rem !important;
+            margin: 5px 15px 1px 0px !important;
+            border-radius: 5px;
+        }
+
+        .compDetail {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+
+            div {
+                display: flex;
+                flex-direction: row;
+            }
+        }
+    }
+}
+
+.headers{
+    // font-weight: 900 !important;
+    font-weight: bolder !important;
+    background-color: #1182C574;
+}
+// .leftHead{
+//     border-top-left-radius: 10px;
+// }
+
+.searchBar {
+    border-radius: 5px;
+    background-color:#fff !important;
+    box-shadow: 0pc 2px 3px 0px #878787 !important;
+}
+
+.editBtnBG {
+    border: 1px solid #00B232 !important;
+
+    .editBtn {
+        color: #00B232;
+    }
+}
+.editBtnBG:hover {
+    background-color: #00B232 !important;
+
+    .editBtn {
+        color: #fff;
+    }
+}
+
+.deleteBtnBG {
+    border: 1px solid #7E0000 !important;
+
+    .deleteBtn {
+        color: #7E0000;
+    }
+}
+.deleteBtnBG:hover {
+    background-color: #7E0000 !important;
+
+    .deleteBtn {
+        color: #ffffff;
+    }
+}
+
+.restoreBtnBG {
+    border: 1px solid #0686b0 !important;
+
+    .restoreBtn {
+        color: #0686b0;
+    }
+}
+.restoreBtnBG:hover {
+    background-color: #0686b0 !important;
+
+    .restoreBtn {
+        color: #fff;
+    }
+}
+
+
+.mainGrid{
+    border: 1px solid #058dbb !important;
+    border-radius: 5px !important;
+    background-color: #fff;
+}

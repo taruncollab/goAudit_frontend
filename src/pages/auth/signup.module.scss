@@ -1,0 +1,79 @@
+* {
+    font-family: "Lato", sans-serif;
+}
+
+.mainContainer{
+    @media (max-width: 900px) {
+        margin-left: 15%;
+        margin-top: 15%;
+    }
+}
+
+.imageContainer {
+    @media (max-width: 900px) {
+        display: none;
+    }
+}
+
+.image {
+    height: 100vh;
+}
+
+.head {
+    position: absolute;
+    color: #ffffff;
+    z-index: 2;
+    top: 160px;
+    left: 100px;
+    font-weight: bold;
+}
+
+.title {
+    background: -webkit-linear-gradient(90deg, #069CCE, #03607E);
+    -webkit-background-clip: text;
+    /* This is for Safari */
+    -webkit-text-fill-color: transparent;
+    /* This is for Safari */
+    background-clip: text;
+    color: transparent;
+    text-align: center;
+    font-size: 2.5rem;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+
+.input {
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 30px #E2DFDF inset !important;
+    }
+
+}
+
+.note {
+    font-weight: 600 !important;
+}
+
+.link {
+    text-decoration: none;
+    background: -webkit-linear-gradient(90deg, #069CCE, #03607E);
+    -webkit-background-clip: text;
+    /* This is for Safari */
+    -webkit-text-fill-color: transparent;
+    /* This is for Safari */
+    background-clip: text;
+    color: transparent;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold !important;
+}
+
+.submit {
+    background: linear-gradient(to bottom, #069CCE 0%, #03607E 100%);
+    border-radius: 25px !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+}

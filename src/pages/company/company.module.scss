@@ -1,0 +1,212 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif !important;
+}
+
+.main {
+    background-color: transparent !important;
+}
+
+.title {
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+}
+
+.card {
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+
+.tabs {
+    color: #058dbb !important;
+    // color: #03607E !important;
+    border-radius: 25px !important;
+    font-weight: 500 !important;
+    padding: 5px 20px !important;
+
+}
+
+.activeTabs {
+    background: linear-gradient(to bottom, #30AFDC 0%, #0672BC 100%);
+    color: #fff !important;
+    border-radius: 25px !important;
+    // font-size: 18px !important;
+    font-weight: 500 !important;
+    padding: 5px 20px !important;
+}
+
+.addCard {
+    width: 10rem !important;
+    height: 11rem !important;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0px 0px 15px 0px rgba(156, 156, 156, 0.52) !important;
+
+    .addBtn {
+        font-size: 3rem;
+        border: 3px solid #058dbb;
+        color: #058dbb;
+        border-radius: 50%;
+    }
+}
+
+.accordian {
+    background-color: #fff;
+    border: 1px solid #fff;
+    border-radius: 5px !important;
+    -webkit-box-shadow: 0px 0px 5px 5px rgba(156, 156, 156, 0.52) !important;
+    -moz-box-shadow: 0px 0px 5px 5px rgba(156, 156, 156, 0.52) !important;
+    box-shadow: 0px 0px 15px 0px rgba(156, 156, 156, 0.52) !important;
+
+
+    .accordionSummary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center !important;
+        border-radius: 5px !important;
+
+        .summaryLeft {
+            flex: 1;
+
+            .txt1 {
+                color: #4A4A4A;
+                font-weight: 800 !important;
+            }
+
+            .txt2 {
+                font-weight: 800 !important;
+                color: #058dbb;
+            }
+
+            .txt3 {
+                font-weight: 800 !important;
+                color: #00B232;
+            }
+
+            .txt4 {
+                font-weight: 800 !important;
+                color: #F77E09;
+            }
+        }
+
+        .summaryRight {
+            display: flex;
+            align-items: center;
+
+            .iconBG {
+                background-color: #ECECEC;
+                margin-left: 0.5rem;
+
+            }
+        }
+    }
+
+    .accordianDetail {
+        background-color: #d9d9d9;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        padding: 0 !important;
+
+        .imgCover {
+            height: 6rem !important;
+            display: flex;
+            align-items: center;
+
+        }
+
+        .tit {
+            font-weight: 600 !important;
+            // border: 2px solid chocolate;
+            color: #4A4A4A;
+        }
+
+        .des {
+            color: #4A4A4A;
+        }
+    }
+}
+
+.icons {
+    width: 1.3rem;
+}
+
+.editBtnBG {
+    border: 1px solid #00B232 !important;
+
+    .editBtn {
+        color: #00B232;
+    }
+}
+.editBtnBG:hover {
+    background-color: #00B232 !important;
+
+    .editBtn {
+        color: #fff;
+    }
+}
+
+.deleteBtnBG {
+    border: 1px solid #7E0000 !important;
+
+    .deleteBtn {
+        color: #7E0000;
+    }
+}
+.deleteBtnBG:hover {
+    background-color: #7E0000 !important;
+
+    .deleteBtn {
+        color: #ffffff;
+    }
+}
+
+.restoreBtnBG {
+    border: 1px solid #0686b0 !important;
+
+    .restoreBtn {
+        color: #0686b0;
+    }
+}
+.restoreBtnBG:hover {
+    background-color: #0686b0 !important;
+
+    .restoreBtn {
+        color: #fff;
+    }
+}
+
+.headers {
+    font-weight: bolder !important;
+    background-color: #1182C574;
+}
+
+.compLogoBG {
+    width: 4rem !important;
+    border-radius: 50%;
+    border: 2px solid green;
+    margin: 0 auto;
+}
+.compLogo {
+    width: 4rem !important;
+    // border-radius: 50%;
+}
+
+.searchBar {
+    // border: 3px solid red !important;
+    border-radius: 5px;
+    background-color:#fff !important;
+    box-shadow: 0pc 2px 3px 0px #878787 !important;
+    // outline: none !important;
+    // border: none !important;
+}
+
+.mainGrid {
+    border: 1px solid #058dbb !important;
+    border-radius: 5px !important;
+    background-color: #fff;
+}
