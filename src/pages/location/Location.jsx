@@ -1,62 +1,123 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as Yup from "yup";
-import {
-  Grid,
-  Card,
-  Typography,
-  Box,
-  Tabs,
-  Tab,
-  Button,
-  Stack,
-} from "@mui/material";
+import { Grid, Card, Typography, Box, Button, Stack } from "@mui/material";
 import LiveLocations from "./LiveLocations";
 import locationCSS from "./location.module.scss";
 import DeletedLocation from "./DeletedLocation";
 import { useDispatch, useSelector } from "react-redux";
 import FormDrawer from "../../components/Drawer/FormDrawer";
-import { addLocation, updateLocationbyid } from "../../apis/locationSlice";
+import {
+  addLocation,
+  getLocations,
+  updateLocationbyid,
+} from "../../apis/locationSlice";
 import { toast } from "react-toastify";
+import { getCompanies } from "../../apis/companySlice";
+import { debounce } from "lodash";
+import Swal from "sweetalert2";
+import {
+  AddLocationAlt as AddLocationAltIcon,
+  WhereToVote as WhereToVoteIcon,
+  FmdBad as FmdBadIcon,
+} from "@mui/icons-material";
 
 // ==============================|| DASHBOARD DEFAULT ||============================== //
 const Location = () => {
-  const [value, setValue] = useState(0);
   const [showLive, setShowLive] = useState(true);
   const [formDrawer, setFormDrawer] = useState([false, null]);
+  const [orgOptions, setOrgOptions] = useState([]);
+  const [inputValue, setInputValue] = useState("");
+  const [selectedValue, setSelectedValue] = useState(null);
 
   const dispatch = useDispatch();
-  const { comp } = useSelector((state) => state.companyData);
   const { auth } = useSelector((state) => state.authData);
+
+  //Search-------------------------------------
+
+  const fetchOptions = useCallback(
+    debounce(async (query) => {
+      try {
+        let response;
+        // Fetch all companies if inputValue is empty, otherwise fetch based on search query
+
+        if (query?.length === 0) {
+          response = await dispatch(getCompanies({}));
+        } else {
+          response = await dispatch(getCompanies({ search: query }));
+        }
+
+        if (response?.type?.includes("fulfilled")) {
+          const searchData = response?.payload?.data?.map((item) => ({
+            label: item?.name,
+            value: item?._id,
+          }));
+
+          setOrgOptions(searchData);
+        }
+      } catch (error) {
+        toast.error("Error fetching options:", error);
+      }
+    }, 1000),
+    [dispatch]
+  );
+
+  useEffect(() => {
+    if (inputValue !== undefined) {
+      fetchOptions(inputValue);
+    }
+  }, [inputValue, fetchOptions]);
+
+  const handleInputChange = (event, newInputValue) => {
+    setInputValue(newInputValue);
+  };
+
+  //Submit-------------------------------------
 
   const submitFun = async (values) => {
     if (formDrawer[1] !== null) {
-      const res = await dispatch(updateLocationbyid(values));
+      const res = await dispatch(
+        updateLocationbyid({ ...values, compId: selectedValue })
+      );
       if (res.type.includes("fulfilled")) {
-        setFormDrawer([false, null])
-        toast.success("Location Data Updated successfully")
+        setFormDrawer([false, null]);
+        Swal.fire({
+          title: "Success",
+          text: res.payload.message,
+          icon: "success",
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
       }
     } else {
-      const res = await dispatch(addLocation({...values, createdBy: auth._id}));
+      const res = await dispatch(
+        addLocation({ ...values, compId: selectedValue, createdBy: auth?._id })
+      );
       if (res.type.includes("fulfilled")) {
-        setFormDrawer([false, null])
-        toast.success("Location added successfully")
+        setFormDrawer([false, null]);
+        dispatch(getLocations({}));
+        Swal.fire({
+          title: "Success",
+          text: res.payload.message,
+          icon: "success",
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
       }
     }
   };
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
-
   const inputForm = [
     {
-      title: "Select Company",
+      title: "Select or Search Company",
       name: "compId",
       type: "select",
-      options: comp,
+      options: orgOptions,
       add: true,
       edit: true,
     },
+
     {
       title: "Location Name",
       name: "locName",
@@ -70,6 +131,7 @@ const Location = () => {
       title: "Location Code",
       name: "locationCode",
       type: "number",
+      validate: Yup.string().min(2).required("Location Code is required"),
       add: true,
       edit: true,
     },
@@ -78,6 +140,7 @@ const Location = () => {
       name: "address",
       type: "text",
       multiline: true,
+      validate: Yup.string().min(2).required("Address is required"),
       add: true,
       edit: true,
     },
@@ -86,6 +149,7 @@ const Location = () => {
       name: "postCode",
       type: "number",
       add: true,
+      validate: Yup.string().min(2).required("Postcode is required"),
       edit: true,
     },
     {
@@ -123,7 +187,7 @@ const Location = () => {
                     }`}
                     onClick={() => setShowLive(true)}
                   >
-                    Locations
+                    <WhereToVoteIcon sx={{ mr: 1 }} /> Locations
                   </Button>
                   <Button
                     className={` ${
@@ -131,7 +195,7 @@ const Location = () => {
                     }`}
                     onClick={() => setShowLive(false)}
                   >
-                    Deleted / Archived
+                    <FmdBadIcon sx={{ mr: 1 }} /> Deleted / Archived
                   </Button>
                 </Stack>
                 <Box>
@@ -140,17 +204,26 @@ const Location = () => {
                     className={`me-4 ${locationCSS.addBtn}`}
                     onClick={() => setFormDrawer([true, null])}
                   >
-                    Add
+                    <AddLocationAltIcon sx={{ mr: 1 }} /> Add
                   </Button>
                 </Box>
               </Grid>
 
-              {showLive ? <LiveLocations /> : <DeletedLocation />}
+              {showLive ? (
+                <LiveLocations
+                  setSelectedValue={setSelectedValue}
+                  selectedValue={selectedValue}
+                  form={inputForm}
+                />
+              ) : (
+                <DeletedLocation />
+              )}
             </Box>
           </Card>
         </Grid>
       </Grid>
 
+      {/* Dynamic Form */}
       <FormDrawer
         anchor="right"
         title="Add Location"
@@ -159,6 +232,11 @@ const Location = () => {
         submitFun={submitFun}
         open={formDrawer}
         setOpen={setFormDrawer}
+        setInputValue={setInputValue}
+        inputValue={inputValue}
+        handleInputChange={handleInputChange}
+        setSelectedValue={setSelectedValue}
+        selectedValue={selectedValue}
       />
     </>
   );

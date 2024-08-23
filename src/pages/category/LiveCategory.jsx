@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   IconButton,
   Box,
@@ -10,28 +10,29 @@ import {
 } from "@mui/material";
 import { DataGrid, GridDeleteIcon } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Edit as EditIcon,
-  CorporateFare as CorporateFareIcon,
-} from "@mui/icons-material";
-import {
-  deleteLocationbyid,
-  getLocations,
-  updateLocationbyid,
-} from "../../apis/locationSlice";
-import locationCSS from "./location.module.scss";
+import categoryCss from "./category.module.scss";
 import FormDrawer from "../../components/Drawer/FormDrawer";
 import Swal from "sweetalert2";
 import useHandleDelete from "../../common/DeleteFunction";
 import LoadingTable from "../../common/loadingTable";
+import {
+  Category as CategoryIcon,
+  Edit as EditIcon,
+} from "@mui/icons-material";
 
-const LiveLocations = (props) => {
-  const { setSelectedValue, selectedValue, form } = props;
+import {
+  deleteCategorybyid,
+  getCategories,
+  updateCategorybyid,
+} from "../../apis/categorySlice";
+
+const LiveCategory = (props) => {
+  const { form } = props;
   const dispatch = useDispatch();
 
   const { auth } = useSelector((state) => state.authData);
-  const { location, totalPages, locationLoading } = useSelector(
-    (state) => state.locationData
+  const { category, totalPages, loading } = useSelector(
+    (state) => state.categoryData
   );
 
   //State Zone---------------------
@@ -43,7 +44,9 @@ const LiveLocations = (props) => {
   //Effect Zone---------------------
 
   useEffect(() => {
-    dispatch(getLocations({ page: currentPage, limit: 5, search: searchTerm }));
+    dispatch(
+      getCategories({ page: currentPage, limit: 5, search: searchTerm })
+    );
   }, [dispatch, currentPage, searchTerm]);
 
   //---For Pagination-----
@@ -53,27 +56,20 @@ const LiveLocations = (props) => {
   };
 
   //Handle Delete===================
-  const handleDelete = useHandleDelete(deleteLocationbyid, "Location");
+  const handleDelete = useHandleDelete(deleteCategorybyid, "Category");
 
   //Edit-------------------------------------
   const handleEdit = (id) => {
-    const data = location?.find((e) => e._id == id);
-    setSelectedValue(data?.compId);
+    const data = category?.find((e) => e._id == id);
     setFormDrawer([true, data]);
   };
 
   //Submit-------------------------------------
   const submitFun = async (values) => {
     if (formDrawer[1] !== null) {
-      const res = await dispatch(
-        updateLocationbyid({
-          ...values,
-          compId: selectedValue,
-        })
-      );
+      const res = await dispatch(updateCategorybyid(values));
 
       if (res.type.includes("fulfilled")) {
-        setSelectedValue(null);
         setFormDrawer([false, null]);
         Swal.fire({
           title: "Success",
@@ -97,7 +93,7 @@ const LiveLocations = (props) => {
       headerName: <b> ACTION </b>,
       sortable: false,
       headerAlign: "center",
-      headerClassName: locationCSS.headers,
+      headerClassName: categoryCss.headers,
       align: "center",
       disableColumnMenu: true,
       width: 150,
@@ -112,19 +108,19 @@ const LiveLocations = (props) => {
           >
             <IconButton
               size="small"
-              onClick={() => handleEdit(params.row._id)}
-              className={locationCSS.editBtnBG}
+              onClick={() => handleEdit(params?.row?._id)}
+              className={categoryCss.editBtnBG}
             >
-              <EditIcon className={locationCSS.editBtn} />
+              <EditIcon className={categoryCss.editBtn} />
             </IconButton>
             <IconButton
               size="small"
               onClick={() => {
                 handleDelete({ id: params?.row?._id, dId: auth?._id });
               }}
-              className={locationCSS.deleteBtnBG}
+              className={categoryCss.deleteBtnBG}
             >
-              <GridDeleteIcon className={locationCSS.deleteBtn} />
+              <GridDeleteIcon className={categoryCss.deleteBtn} />
             </IconButton>
           </Stack>
         </>
@@ -132,18 +128,14 @@ const LiveLocations = (props) => {
     },
 
     {
-      field: "compId",
+      field: "name",
       headerName: (
         <b>
-          <span>
-            COMPANY/
-            <br />
-            DEPARTMENT
-          </span>
+          <span>Category Name</span>
         </b>
       ),
       headerAlign: "center",
-      headerClassName: locationCSS.headers,
+      headerClassName: categoryCss.headers,
       disableColumnMenu: true,
       sortable: false,
       align: "left",
@@ -151,73 +143,13 @@ const LiveLocations = (props) => {
       renderCell: (params) => {
         return (
           <Chip
-            label={params?.row?.compId?.label || "No Company Name"}
+            label={params?.row?.name || "No Category Name"}
             variant="outlined"
             sx={{ borderColor: "#0672BC", color: "#0672BC" }}
-            icon={<CorporateFareIcon />}
+            icon={<CategoryIcon />}
           />
         );
       },
-    },
-    {
-      field: "locName",
-      headerName: <b> LOCATION </b>,
-      headerAlign: "center",
-      headerClassName: locationCSS.headers,
-      align: "center",
-      disableColumnMenu: true,
-      sortable: false,
-      width: 100,
-    },
-    {
-      field: "locationCode",
-      headerName: <b> LOCATION CODE </b>,
-      headerAlign: "center",
-      headerClassName: locationCSS.headers,
-      align: "center",
-      disableColumnMenu: true,
-      sortable: false,
-      width: 140,
-    },
-    {
-      field: "address",
-      headerName: <b> ADDRESS </b>,
-      headerAlign: "center",
-      headerClassName: locationCSS.headers,
-      align: "center",
-      disableColumnMenu: true,
-      sortable: false,
-      width: 200,
-    },
-    {
-      field: "postCode",
-      headerName: <b> ZIP CODE </b>,
-      headerAlign: "center",
-      headerClassName: locationCSS.headers,
-      align: "center",
-      disableColumnMenu: true,
-      sortable: false,
-      width: 100,
-    },
-    {
-      field: "toMail",
-      headerName: <b> TO MAIL </b>,
-      headerAlign: "center",
-      headerClassName: locationCSS.headers,
-      align: "center",
-      disableColumnMenu: true,
-      sortable: false,
-      width: 200,
-    },
-    {
-      field: "ccMail",
-      headerName: <b> CC MAIL </b>,
-      headerAlign: "center",
-      headerClassName: locationCSS.headers,
-      align: "center",
-      disableColumnMenu: true,
-      sortable: false,
-      width: 200,
     },
   ];
 
@@ -227,9 +159,9 @@ const LiveLocations = (props) => {
         <TextField
           fullWidth
           size="small"
-          placeholder="Search Locations"
+          placeholder="Search Category"
           onChange={searchData}
-          className={locationCSS.searchBar}
+          className={categoryCss.searchBar}
           InputProps={{
             disableUnderline: true,
             sx: {
@@ -243,13 +175,13 @@ const LiveLocations = (props) => {
       </Grid>
 
       <Grid item md={12} xs={12} ml={4} mt={3} mr={3}>
-        {locationLoading ? (
+        {loading ? (
           <LoadingTable />
-        ) : location && location?.length > 0 ? (
+        ) : category && category?.length > 0 ? (
           <DataGrid
-            rows={location}
+            rows={category}
             columns={columns}
-            className={locationCSS.mainGrid}
+            className={categoryCss.mainGrid}
             autoHeight
             autoWidth
             pagination={false}
@@ -300,17 +232,15 @@ const LiveLocations = (props) => {
 
       <FormDrawer
         anchor="right"
-        title="Add Company"
-        editTitle="Edit Company"
+        title="Add Category"
+        editTitle="Edit Category"
         form={form}
         submitFun={submitFun}
         open={formDrawer}
         setOpen={setFormDrawer}
-        selectedValue={selectedValue}
-        setSelectedValue={setSelectedValue}
       />
     </>
   );
 };
 
-export default LiveLocations;
+export default LiveCategory;

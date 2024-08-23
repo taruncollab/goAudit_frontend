@@ -45,6 +45,8 @@ import userBlack from "../assets/black/userBlack.png";
 import formBlack from "../assets/black/formBlack.png";
 import formRecordBlack from "../assets/black/formRecordBlack.png";
 import compareBlack from "../assets/black/compareBlack.png";
+import categoryBlack from "../assets/black/category_black.png";
+import categoryWhite from "../assets/white/category_White.png";
 
 const drawerWidth = 250;
 
@@ -175,17 +177,11 @@ export default function Sidebar(props) {
                   alt="company"
                   className={style.icons}
                 />
-                {/* <BusinessOutlinedIcon
-                  className={
-                    location.pathname == "/company"
-                      ? style.activeIcon
-                      : style.menuIcon
-                  }
-                /> */}
               </ListItemIcon>
               <ListItemText primary={"Company"} />
             </ListItemButton>
           </ListItem>
+
           <ListItem
             className={
               location.pathname == "/location" ? style.active : style.menus
@@ -207,22 +203,42 @@ export default function Sidebar(props) {
                   alt="location"
                   className={style.icons}
                 />
-                {/* <PinDropOutlinedIcon
-                  className={
-                    location.pathname == "/location"
-                      ? style.activeIcon
-                      : style.menuIcon
-                  }
-                /> */}
               </ListItemIcon>
               <ListItemText primary={"Location"} />
             </ListItemButton>
           </ListItem>
+
           <ListItem
             className={
-              location.pathname == "/question" ||
-              location.pathname.includes("questionform") ||
-              location.pathname.includes("questiondetails")
+              location.pathname == "/category" ? style.active : style.menus
+            }
+          >
+            <ListItemButton
+              onClick={() => {
+                navigate("/category");
+                handleDrawerClose();
+              }}
+            >
+              <ListItemIcon>
+                <img
+                  src={
+                    location.pathname == "/category"
+                      ? categoryWhite
+                      : categoryBlack
+                  }
+                  alt="category"
+                  className={style.icons}
+                />
+              </ListItemIcon>
+              <ListItemText primary={"Category"} />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem
+            className={
+              location?.pathname == "/question" ||
+              location?.pathname?.includes("questionform") ||
+              location?.pathname?.includes("questiondetails")
                 ? style.active
                 : style.menus
             }
@@ -236,24 +252,15 @@ export default function Sidebar(props) {
               <ListItemIcon>
                 <img
                   src={
-                    location.pathname == "/question" ||
-                    location.pathname.includes("questionform") ||
-                    location.pathname.includes("questiondetails")
+                    location?.pathname == "/question" ||
+                    location?.pathname?.includes("questionform") ||
+                    location?.pathname?.includes("questiondetails")
                       ? questionWhite
                       : questionBlack
                   }
                   alt="question"
                   className={style.icons}
                 />
-                {/* <HelpOutlineOutlinedIcon
-                  className={
-                    location.pathname == "/question" ||
-                    location.pathname.includes("questionform") ||
-                    location.pathname.includes("questiondetails")
-                      ? style.activeIcon
-                      : style.menuIcon
-                  }
-                /> */}
               </ListItemIcon>
               <ListItemText primary={"Add Question"} />
             </ListItemButton>
@@ -283,14 +290,6 @@ export default function Sidebar(props) {
                   alt="forms"
                   className={style.icons}
                 />
-                {/* <NoteAltOutlinedIcon
-                  className={
-                    location.pathname == "/showforms" ||
-                    location.pathname.includes("fillform")
-                      ? style.activeIcon
-                      : style.menuIcon
-                  }
-                /> */}
               </ListItemIcon>
               <ListItemText primary={"Fill Form"} />
             </ListItemButton>

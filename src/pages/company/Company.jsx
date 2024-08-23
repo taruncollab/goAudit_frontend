@@ -1,42 +1,36 @@
 import { useState } from "react";
-import {
-  Grid,
-  Card,
-  Typography,
-  Box,
-  Tabs,
-  Tab,
-  Stack,
-  Button,
-} from "@mui/material";
+import { Grid, Card, Typography, Box, Stack, Button } from "@mui/material";
 import companyCSS from "./company.module.scss";
 import LiveCompanies from "./LiveCompanies";
 import DeletedCompanies from "./DeletedCompanies";
 import FormDrawer from "../../components/Drawer/FormDrawer";
 import * as Yup from "yup";
-import { addCompany } from "../../apis/companySlice";
+import {
+  addCompany,
+  getCompanies,
+  updateCompanybyid,
+} from "../../apis/companySlice";
 import { useDispatch, useSelector } from "react-redux";
-import swal from 'sweetalert';
+import { toast } from "react-toastify";
+import {
+  CorporateFare as CorporateFareIcon,
+  Delete as DeleteIcon,
+  DomainAdd as DomainAddIcon,
+} from "@mui/icons-material";
 
-
-// ==============================|| DASHBOARD DEFAULT ||============================== //
+// ==============================|| Company Screen || DEFAULT ||============================== //
 
 const Company = () => {
+  const dispatch = useDispatch();
+  const { auth } = useSelector((state) => state.authData);
 
-  const {auth} = useSelector(state => state.authData)
-
-  const [value, setValue] = useState(0);
+  //State Zone--------------------------
   const [showLive, setShowLive] = useState(true);
-
   const [upload, setUpload] = useState(null);
   const [base64, setBase64] = useState(null);
   const [formDrawer, setFormDrawer] = useState([false, null]);
 
-  const dispatch = useDispatch();
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
+  //Effect Zone--------------------------
 
   const inputForm = [
     {
@@ -66,6 +60,8 @@ const Company = () => {
     },
   ];
 
+  //Function Zone--------------------------
+
   const handleSelectedFile = (event) => {
     const file = event.target.files[0];
 
@@ -85,6 +81,7 @@ const Company = () => {
     };
   };
 
+  //Submit--------------------------
   const submitFun = async (values) => {
     if (formDrawer[1] !== null) {
       const res = await dispatch(updateCompanybyid(values));
@@ -102,6 +99,7 @@ const Company = () => {
         setUpload(null);
         setBase64(null);
         toast.success("Company added successfully");
+        dispatch(getCompanies({}));
       }
     }
   };
@@ -139,21 +137,25 @@ const Company = () => {
                     }`}
                     onClick={() => setShowLive(true)}
                   >
-                    Company
+                    <CorporateFareIcon sx={{ mr: 1 }} /> All Companies
                   </Button>
+
                   <Button
                     className={` ${
                       showLive ? companyCSS.tabs : companyCSS.activeTabs
                     }`}
                     onClick={() => setShowLive(false)}
                   >
-                    Deleted / Archived
+                    <DeleteIcon sx={{ mr: 1 }} /> Deleted / Archived
                   </Button>
                 </Grid>
 
-                <Grid mr={3} >
-                  <Button className={companyCSS.activeTabs} onClick={() => setFormDrawer([true, null])}>
-                    Add
+                <Grid mr={3}>
+                  <Button
+                    className={companyCSS.activeTabs}
+                    onClick={() => setFormDrawer([true, null])}
+                  >
+                    <DomainAddIcon sx={{ mr: 1 }} /> Add
                   </Button>
                 </Grid>
               </Stack>

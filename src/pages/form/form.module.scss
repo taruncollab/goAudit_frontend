@@ -1,131 +1,196 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif !important;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif !important;
+}
+
+.mainBox {
+  box-shadow: 0px 0px 10px 0px rgba(193, 223, 248, 0.733) !important;
+  background-color: rgb(255, 255, 255) !important;
+  border-radius: 20px !important;
+  padding: 10px 0px 2px 0px !important;
+  width: 98% !important;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 20px;
+  background-color: #cde7f38e !important;
+  margin: 10px 40px 10px 20px !important;
+  padding: 10px !important;
+  width: 96.5% !important;
 }
 
 .title {
-    font-weight: 700 !important;
-    font-size: 1.5rem !important;
+  font-weight: 500 !important;
+  font-size: 1.6rem !important;
+  margin-left: 1.5rem !important;
+  margin-top: 0.2rem !important;
+  color: #115372 !important;
+  font-size: 1.6rem !important;
 }
 
-.head{
-    font-size: 1.3rem !important;
-    font-weight: 500 !important;
+.questionimage {
+  height: 180px !important;
+  margin-right: 50px;
+  background-color: transparent;
+  mix-blend-mode: multiply;
+}
+
+.head {
+  font-size: 1.3rem !important;
+  font-weight: 500 !important;
+  color: #0867a7 !important;
 }
 
 .headers {
-    font-weight: bolder !important;
-    background-color: #1182C574;
+  font-weight: bolder !important;
+  background-color: #1182c574 !important;
 }
 
-.fillBtnBG{
-    border: 1px solid #112C6E !important;
-    .fillBtn{
-        color: #112C6E;
-    }
+.fillBtnBG {
+  border: 1px solid #168f06 !important;
+  .fillBtn {
+    color: #30910a;
+  }
 }
 
 .mainGrid {
-    border: 1px solid #058dbb !important;
-    border-radius: 5px !important;
-    background-color: #fff;
+  border: 1px solid #058dbb !important;
+  border-radius: 5px !important;
+  background-color: #fff;
 }
 
 // ================================================================================================
 
-.questionBox{
-    box-shadow: 0px 0px 15px 0px rgba(156, 156, 156, 0.52) !important;
-    .questionText{
-        font-weight: bold;
-        color: #F77E09;
+.questionBox {
+  box-shadow: 0px 0px 1px 0px #058dbb !important;
+  background-color: "#cde7f3" !important;
+  border-radius: 20px !important;
+  padding: 20px !important;
+
+  .questionText {
+    font-weight: 500 !important;
+    color: #f77e09;
+    font-size: 1.1rem;
+  }
+  .attachmentBtn {
+    border: 1px solid #f77e09 !important;
+    color: #898989 !important;
+    padding: 10px 55px 10px 25px !important;
+    border-radius: 20px !important;
+
+    &:hover {
+      background-color: #ffe9d5 !important;
+      color: #000000 !important;
     }
-    .attachmentBtn{
-        border: 1px solid #898989 !important;
-        color: #898989 !important;
-        padding: 5px 45px 5px 5px !important;
-    }
-    
-    .remarkBtn{
-        background: linear-gradient(to bottom, #30AFDC 0%, #0672BC 100%);
-        color: #fff !important;
-        padding: 9px 20px !important;
-    }
+  }
+
+  .remarkBtn {
+    // background: linear-gradient(to bottom, #30afdc 0%, #0672bc 100%);
+    background: linear-gradient(to bottom, #71bdd8 0%, #487e99 100%);
+    color: #ffffff !important;
+    padding: 5px 15px !important;
+    border-radius: 20px;
+  }
 }
 
+textarea::placeholder {
+  color: #999;
+  font-size: 14px;
+  line-height: 1.2;
+}
 
 .submitBtn {
-    background-color: #0672BC !important;
-    color: #fff !important;
+  background-color: #0672bc !important;
+  color: #fff !important;
+  border-radius: 20px !important;
+  font-size: 14px !important;
+  padding: 10px 25px !important;
+
+  &:hover {
+    background-color: #000000 !important;
+  }
 }
 
 .cancelBtn {
-    background-color: #AF0000 !important;
-    color: #fff !important;
+  background-color: #af0000 !important;
+  color: #fff !important;
+  border-radius: 20px !important;
+  font-size: 14px !important;
+  padding: 10px 25px !important;
+
+  &:hover {
+    background-color: #000000 !important;
+  }
 }
 
-
 // ================================================================================================
-.infoBtn{
-    color: #0672BC;
+.infoBtn {
+  color: #21a110;
 }
 // ================================================================================================
 
 .auditTitle {
-    font-weight: 600 !important;
-    font-size: 1.8rem !important;
+  font-weight: 500 !important;
+  font-size: 1.3rem !important;
+  color: #055975 !important;
 }
 
 .key {
-    color: #058dbb;
-    font-size: 18px !important;
-    font-weight: 700 !important;
+  color: #058dbb;
+  font-size: 16px !important;
+  font-weight: 500 !important;
 }
 
 .value {
-    font-size: 18px !important;
+  font-size: 16px !important;
 }
 
 .edit {
-    background-color: #0672BC !important;
-    color: #fff !important;
+  background-color: #1b6191 !important;
+  color: #fff !important;
 }
 
 .backBtn {
-    background-color: #AF0000 !important;
-    color: #fff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 
 .questionCard {
-    .questionHead {
-        background-color: #1182C574;
-        padding: 10px 0px;
+  .questionHead {
+    background-color: #1182c574;
+    padding: 10px 0px;
 
-        .questionTitleText {
-            font-size: 18px !important;
+    .questionTitleText {
+      font-size: 18px !important;
 
-            .questionNum {
-                font-weight: 600 !important;
-            }
-        }
+      .questionNum {
+        font-weight: 600 !important;
+      }
     }
-    .cardContent{
-        box-shadow: none !important;
-    }
+  }
+  .cardContent {
+    box-shadow: none !important;
+  }
 }
 
 .questionKey {
-    font-weight: 600 !important;
+  font-weight: 600 !important;
+  color: #055975 !important;
 }
 
 .prefAns {
-    color: #00B232;
-    font-weight: 500 !important;
+  color: #00b232;
+  font-weight: 500 !important;
+  margin-left: 5px !important;
 }
 
 .searchBar {
-    border-radius: 5px;
-    background-color:#fff !important;
-    box-shadow: 0pc 2px 3px 0px #878787 !important;
+  border-radius: 5px;
+  background-color: #fff !important;
+  box-shadow: 0pc 2px 3px 0px #878787 !important;
 }

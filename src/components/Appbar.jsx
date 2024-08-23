@@ -21,7 +21,7 @@ import ArrowDropDownCircleOutlinedIcon from "@mui/icons-material/ArrowDropDownCi
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import menu from "../assets/menu.png";
-import SearchIcon from '@mui/icons-material/Search';
+import SearchIcon from "@mui/icons-material/Search";
 
 const Appbar = () => {
   const { auth } = useSelector((state) => state.authData);
@@ -60,21 +60,25 @@ const Appbar = () => {
           <div className={style.appbar}>
             <div className={style.appbar_left}>
               <div>
-                <img src={logo} alt="audit" style={{cursor:"pointer"}} onClick={()=> navigate("/")}/>
+                <img
+                  src={logo}
+                  alt="audit"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate("/")}
+                />
               </div>
               <IconButton
-              className={style.menu}
+                className={style.menu}
                 color="inherit"
                 aria-label="open drawer"
                 onClick={toggleDrawer}
                 edge="start"
               >
-                <img src={menu} alt="menu"  />
+                <img src={menu} alt="menu" />
                 {/* <MenuIcon style={{ marginLeft: "1.5rem", color: "#000" }} /> */}
               </IconButton>
 
-
-{/* ---------------------------------Search-------------------------------------------------------- */}
+              {/* ---------------------------------Search-------------------------------------------------------- */}
 
               {/* <div>
                 <TextField
@@ -133,17 +137,16 @@ const Appbar = () => {
                   horizontal: "right",
                 }}
                 sx={{
-                  // Add your styles here
                   "& .MuiMenu-paper": {
-                    backgroundColor: "#f0f0f0", // Background color of the menu
-                    borderRadius: "8px", // Rounded corners
-                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Box shadow
+                    backgroundColor: "#f0f0f0",
+                    borderRadius: "8px",
+                    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
                   },
                   "& .MuiMenuItem-root": {
-                    fontSize: "14px", // Font size of the menu items
-                    color: "#333", // Color of the menu items
+                    fontSize: "14px",
+                    color: "#333",
                     "&:hover": {
-                      backgroundColor: "#e0e0e0", // Background color on hover
+                      backgroundColor: "#e0e0e0",
                     },
                   },
                 }}

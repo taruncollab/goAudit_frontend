@@ -11,23 +11,23 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useDispatch, useSelector } from "react-redux";
-import locationCSS from "./location.module.scss";
-import {
-  getDeletedLocations,
-  restoreLocationbyid,
-} from "../../apis/locationSlice";
+import categoryCss from "./category.module.scss";
 import Swal from "sweetalert2";
 import LoadingTable from "../../common/loadingTable";
+import {
+  getDeletedCategories,
+  restoreCategorybyid,
+} from "../../apis/categorySlice";
 import {
   RestorePage as RestorePageIcon,
   CorporateFare as CorporateFareIcon,
 } from "@mui/icons-material";
 
-const DeletedLocation = () => {
+const DeletedCategory = () => {
   const dispatch = useDispatch();
 
-  const { delLocation, locationLoading, totalPages } = useSelector(
-    (state) => state.locationData
+  const { delCategory, totalPages, loading } = useSelector(
+    (state) => state.categoryData
   );
 
   //State Zone------------------------
@@ -39,7 +39,7 @@ const DeletedLocation = () => {
 
   useEffect(() => {
     dispatch(
-      getDeletedLocations({ page: currentPage, limit: 5, search: searchTerm })
+      getDeletedCategories({ page: currentPage, limit: 5, search: searchTerm })
     );
   }, [dispatch, currentPage, searchTerm]);
 
@@ -52,11 +52,15 @@ const DeletedLocation = () => {
   //---For Restore--------------------
 
   const handleRestore = async (id) => {
-    const res = await dispatch(restoreLocationbyid(id));
+    const res = await dispatch(restoreCategorybyid(id));
 
     if (res.type.includes("fulfilled")) {
       dispatch(
-        getDeletedLocations({ page: currentPage, limit: 5, search: searchTerm })
+        getDeletedCategories({
+          page: currentPage,
+          limit: 5,
+          search: searchTerm,
+        })
       );
       Swal.fire({
         title: "Success",
@@ -79,7 +83,7 @@ const DeletedLocation = () => {
       headerName: <b>ACTION </b>,
       sortable: false,
       headerAlign: "center",
-      headerClassName: locationCSS.headers,
+      headerClassName: categoryCss.headers,
       align: "center",
       disableColumnMenu: true,
       width: 100,
@@ -95,30 +99,25 @@ const DeletedLocation = () => {
             <Tooltip title="Restore">
               <IconButton
                 size="small"
-                onClick={() => handleRestore(params.row._id)}
-                className={locationCSS.restoreBtnBG}
+                onClick={() => handleRestore(params.row?._id)}
+                className={categoryCss.restoreBtnBG}
               >
-                <RestorePageIcon className={locationCSS.restoreBtn} />
+                <RestorePageIcon className={categoryCss.restoreBtn} />
               </IconButton>
             </Tooltip>
           </Stack>
         </>
       ),
     },
-
     {
-      field: "compId",
+      field: "name",
       headerName: (
         <b>
-          <span>
-            COMPANY/
-            <br />
-            DEPARTMENT
-          </span>
+          <span>Category Name</span>
         </b>
       ),
       headerAlign: "center",
-      headerClassName: locationCSS.headers,
+      headerClassName: categoryCss.headers,
       disableColumnMenu: true,
       sortable: false,
       align: "left",
@@ -126,74 +125,13 @@ const DeletedLocation = () => {
       renderCell: (params) => {
         return (
           <Chip
-            label={params?.row?.compId?.label || "No Company Name"}
+            label={params?.row?.name || "No Category Name"}
             variant="outlined"
             sx={{ borderColor: "#0672BC", color: "#0672BC" }}
             icon={<CorporateFareIcon />}
           />
         );
       },
-    },
-
-    {
-      field: "locName",
-      headerName: <b> LOCATION </b>,
-      headerAlign: "center",
-      headerClassName: locationCSS.headers,
-      align: "center",
-      disableColumnMenu: true,
-      sortable: false,
-      width: 160,
-    },
-    {
-      field: "locationCode",
-      headerName: <b> LOCATION CODE </b>,
-      headerAlign: "center",
-      headerClassName: locationCSS.headers,
-      align: "center",
-      disableColumnMenu: true,
-      sortable: false,
-      width: 140,
-    },
-    {
-      field: "address",
-      headerName: <b> ADDRESS </b>,
-      headerAlign: "center",
-      headerClassName: locationCSS.headers,
-      align: "center",
-      disableColumnMenu: true,
-      sortable: false,
-      width: 250,
-    },
-    {
-      field: "postCode",
-      headerName: <b> ZIP CODE </b>,
-      headerAlign: "center",
-      headerClassName: locationCSS.headers,
-      align: "center",
-      disableColumnMenu: true,
-      sortable: false,
-      width: 100,
-    },
-    {
-      field: "toMail",
-      headerName: <b> TO MAIL </b>,
-      headerAlign: "center",
-      headerClassName: locationCSS.headers,
-      align: "center",
-      disableColumnMenu: true,
-      sortable: false,
-      width: 200,
-    },
-    {
-      field: "ccMail",
-      headerName: <b> CC MAIL </b>,
-      headerAlign: "center",
-      headerClassName: locationCSS.headers,
-      align: "center",
-      disableColumnMenu: true,
-      sortable: false,
-      width: 200,
     },
   ];
 
@@ -203,9 +141,9 @@ const DeletedLocation = () => {
         <TextField
           fullWidth
           size="small"
-          placeholder="Search Locations"
+          placeholder="Search Category"
           onChange={searchData}
-          className={locationCSS.searchBar}
+          className={categoryCss.searchBar}
           InputProps={{
             disableUnderline: true,
             sx: {
@@ -219,13 +157,13 @@ const DeletedLocation = () => {
       </Grid>
 
       <Grid item md={12} xs={12} ml={4} mt={3} mr={3}>
-        {locationLoading ? (
+        {loading ? (
           <LoadingTable />
-        ) : delLocation && delLocation?.length > 0 ? (
+        ) : delCategory && delCategory?.length > 0 ? (
           <DataGrid
-            rows={delLocation}
+            rows={delCategory}
             columns={columns}
-            className={locationCSS.mainGrid}
+            className={categoryCss.mainGrid}
             autoHeight
             autoWidth
             sx={{
@@ -276,4 +214,4 @@ const DeletedLocation = () => {
   );
 };
 
-export default DeletedLocation;
+export default DeletedCategory;

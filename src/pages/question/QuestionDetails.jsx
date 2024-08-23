@@ -1,68 +1,65 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Button, CardActions, Grid, Stack, Typography } from "@mui/material";
-import {
-  getCategoryName,
-  getCompanyName,
-  getLocationName,
-} from "../../common/common";
+import { Button, Grid, Stack, Tooltip, Typography } from "@mui/material";
 import questionCSS from "./question.module.scss";
-import { getAllLocations } from "../../apis/locationSlice";
-import { getAllCompanies } from "../../apis/companySlice";
+import { getQuestions } from "../../apis/questionSlice";
+import {
+  AdsClick as AdsClickIcon,
+  Edit as EditIcon,
+  ReplyAll as ReplyAllIcon,
+  BorderColor as BorderColorIcon,
+  FormatShapes as FormatShapesIcon,
+  Draw as DrawIcon,
+  Style as StyleIcon,
+} from "@mui/icons-material";
 
 const QuestionDetails = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { question } = useSelector((state) => state.questionData);
+
+  //State Zone----------------------------------------
+
   const [details, setDetails] = useState(null);
 
-  const navigate = useNavigate();
-
-  const { question } = useSelector((state) => state.questionData);
-  const { comp } = useSelector((state) => state.companyData);
-  const { location } = useSelector((state) => state.locationData);
-  const { category } = useSelector((state) => state.categoryData);
-  const dispatch = useDispatch();
-
-  const { id } = useParams();
-
+  // Effect Zone----------------------------------------
 
   useEffect(() => {
-    const callApi = () => {
-      dispatch(getAllCompanies());
-      dispatch(getAllLocations());
+    if (id) {
+      dispatch(getQuestions({}));
+
+      const data = question && question?.find((f) => f?._id == id);
+      setDetails(data);
     }
-    callApi();
-  }, []);
-
-  useEffect(() => {
-    const data = question.find((f) => f._id == id);
-    setDetails(data);
-  }, [id]);
-
+  }, [id, details]);
 
   return (
     <>
-      <Grid container direction={"column"} pl={4}>
+      <Grid container direction={"column"} pl={2}>
         <Grid
           container
           justifyContent={"space-between"}
           alignItems={"center"}
-          mb={2}
+          mb={3}
         >
           <Grid container direction={"column"} item md={8} xs={6}>
-            <Grid item mb={1}>
+            <Grid item mb={3} mt={2}>
               <Typography className={questionCSS.auditTitle}>
-                {details?.title.toUpperCase()}
+                <AdsClickIcon /> {details?.title?.toUpperCase()}
               </Typography>
             </Grid>
+
             <Grid container item direction={"row"} mb={1}>
               <Grid item md={2} xs={6}>
                 <Typography className={questionCSS.key}>Company</Typography>
               </Grid>
               <Grid item md={6} xs={6}>
                 <Typography className={questionCSS.value}>
-                  : {getCompanyName(details?.compId, comp)}
+                  : {details?.compId?.label || "No Company Name"}
                 </Typography>
               </Grid>
             </Grid>
@@ -72,7 +69,7 @@ const QuestionDetails = () => {
               </Grid>
               <Grid item md={6} xs={6}>
                 <Typography className={questionCSS.value}>
-                  : {getLocationName(details?.locId, location)}
+                  : {details?.locId?.label || "No Location Name"}
                 </Typography>
               </Grid>
             </Grid>
@@ -82,98 +79,136 @@ const QuestionDetails = () => {
               </Grid>
               <Grid item md={6} xs={6}>
                 <Typography className={questionCSS.value}>
-                  : {getCategoryName(details?.categoryId, category)}
+                  : {details?.categoryId?.label || "No Category Name"}
                 </Typography>
               </Grid>
             </Grid>
           </Grid>
           <Stack item gap={2} md={4} xs={6} mr={4}>
             <Button
-              className={questionCSS.edit}
-              onClick={() => navigate(`/questionform/${id}`)}
-            >
-              Edit
-            </Button>
-            <Button
               className={questionCSS.backBtn}
               onClick={() => navigate("/question")}
             >
-              Back
+              <ReplyAllIcon sx={{ mr: 1 }} /> Back
             </Button>
+
+            <Tooltip title="Edit">
+              <Button
+                className={questionCSS.edit}
+                onClick={() => navigate(`/questionform/${id}`)}
+              >
+                <EditIcon sx={{ mr: 1 }} /> Edit
+              </Button>
+            </Tooltip>
           </Stack>
         </Grid>
         {details &&
-          details.questions.map((d, i) => {
+          details?.questions?.map((d, i) => {
             return (
-              <Grid mr={4} mb={2} className={questionCSS.questionCard}>
-                <Card>
-                  <Grid className={questionCSS.questionHead}>
-                    <Typography ml={2} className={questionCSS.questionText}>
-                      <span className={questionCSS.questionNum}>
-                        Question {i + 1}:
-                      </span>
-                      &nbsp;&nbsp;&nbsp; {d?.question}
-                    </Typography>
-                  </Grid>
-                  <CardContent className={questionCSS.cardContent}>
-                    <Grid container direction={"column"}>
-                      <Grid container item>
-                        <Grid item md={2} className={questionCSS.questionKey}>
-                          Type
-                        </Grid>
-                        <Grid item md={10}>
-                          :{d?.type}
-                        </Grid>
-                      </Grid>
-                          {d?.options.length !== 0 ? (
-                            <Grid container item>
-                              <Grid item md={2} className={questionCSS.questionKey}>
-                                Options
-                              </Grid>
-                              <Grid item md={10}>
-                                :
-                                {d?.options.map((o, index) => (
-                                  <span key={index}>
-                                    <b>{index + 1}.</b> {o} &nbsp;&nbsp;&nbsp;&nbsp;
-                                  </span>
-                                ))}
-                              </Grid>
-                            </Grid>
-                          ) : (
-                            <></>
-                          )}
-                      {d?.prefAns.length > 0 ? (
-                        <Grid container item>
-                        <Grid item md={2} className={questionCSS.questionKey}>
-                          Preferred Answer
-                        </Grid>
-                        <Grid item md={10}>
-                          :{d?.type === "multichoice"
-                            ? d?.prefAns
-                                .filter((p) => p.trim() !== "") // Filter out blank or whitespace-only strings
-                                .map((p, index) => (
-                                  <span key={index}>
-                                    <b>{index + 1}.</b> <span className={questionCSS.prefAns}>{p}</span>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;
-                                  </span>
-                                ))
-                            : <span className={questionCSS.prefAns}>{d?.prefAns}</span>}
-                        </Grid>
-                      </Grid>
-                      ) : (
-                        <Grid container item>
-                        <Grid item md={2} className={questionCSS.questionKey}>
-                          Preferred Answer
-                        </Grid>
-                        <Grid item md={10}>
-                          : <span className={questionCSS.prefAns}>N/A</span>
-                        </Grid>
-                      </Grid>
-                      )}
+              <>
+                <Grid
+                  mr={4}
+                  className={questionCSS.questionCard}
+                  sx={{
+                    mb: { xs: 2, sm: 0, md: 0, lg: 0 },
+                  }}
+                >
+                  <Card>
+                    <Grid className={questionCSS.questionHead}>
+                      <Typography ml={2} className={questionCSS.questionText}>
+                        <span className={questionCSS.questionNum}>
+                          <img
+                            src="/src/assets/Question.png"
+                            style={{
+                              width: "23px",
+                              height: "23px",
+                              marginRight: "5px",
+                            }}
+                          />
+                          Question {i + 1}:
+                        </span>
+                        &nbsp;&nbsp;&nbsp; {d?.question}
+                      </Typography>
                     </Grid>
-                  </CardContent>
-                </Card>
-              </Grid>
+                    <CardContent className={questionCSS.cardContent}>
+                      <Grid container direction={"column"}>
+                        <Grid container item>
+                          <Grid item md={2} className={questionCSS.questionKey}>
+                            <FormatShapesIcon sx={{ mr: 1 }} /> Type :
+                          </Grid>
+
+                          <Grid item md={10}>
+                            {d?.type}
+                          </Grid>
+                        </Grid>
+                        {d?.options?.length !== 0 ? (
+                          <Grid container item mt={2}>
+                            <Grid
+                              item
+                              md={2}
+                              className={questionCSS.questionKey}
+                            >
+                              <StyleIcon sx={{ mr: 1 }} /> Options :
+                            </Grid>
+                            <Grid item md={10}>
+                              {d?.options?.map((o, index) => (
+                                <span key={index}>
+                                  <b>{index + 1}.</b> {o} &nbsp;&nbsp;&nbsp;
+                                </span>
+                              ))}
+                            </Grid>
+                          </Grid>
+                        ) : (
+                          <></>
+                        )}
+                        {d?.prefAns?.length > 0 ? (
+                          <Grid container item mt={2}>
+                            <Grid
+                              item
+                              md={2}
+                              className={questionCSS.questionKey}
+                            >
+                              <DrawIcon sx={{ mr: 1 }} /> Preferred Answer :
+                            </Grid>
+                            <Grid item md={10}>
+                              {d?.type === "multichoice" ? (
+                                d?.prefAns
+                                  ?.filter((p) => p.trim() !== "") // Filter out blank or whitespace-only strings
+                                  .map((p, index) => (
+                                    <span key={index}>
+                                      <b>{index + 1}.</b>{" "}
+                                      <span className={questionCSS.prefAns}>
+                                        {p}
+                                      </span>
+                                      &nbsp;&nbsp;&nbsp;&nbsp;
+                                    </span>
+                                  ))
+                              ) : (
+                                <span className={questionCSS.prefAns}>
+                                  {d?.prefAns}
+                                </span>
+                              )}
+                            </Grid>
+                          </Grid>
+                        ) : (
+                          <Grid container item mt={2}>
+                            <Grid
+                              item
+                              md={2}
+                              className={questionCSS.questionKey}
+                            >
+                              Preferred Answer :
+                            </Grid>
+                            <Grid item md={10}>
+                              <span className={questionCSS.prefAns}>N/A</span>
+                            </Grid>
+                          </Grid>
+                        )}
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </>
             );
           })}
       </Grid>

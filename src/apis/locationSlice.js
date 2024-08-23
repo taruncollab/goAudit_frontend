@@ -36,27 +36,33 @@ export const getAllLocations = createAsyncThunk(
 
 export const getLocations = createAsyncThunk(
   "getLocations",
-  async (data, { rejectWithValue }) => {
+  async ({ page = 1, limit = 5, search = "" }, { rejectWithValue }) => {
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_PATH}/location/getlocations`,
-        data,
+        `${
+          import.meta.env.VITE_BACKEND_PATH
+        }/location/getlocations?page=${page}&limit=${limit}`,
+        { search },
         apiHeader
       );
       return res.data;
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue(
+        error.response ? error.response.data : { message: error.message }
+      );
     }
   }
 );
 
 export const getDeletedLocations = createAsyncThunk(
   "getDeletedLocations",
-  async (data, { rejectWithValue }) => {
+  async ({ page = 1, limit = 5, search = "" }, { rejectWithValue }) => {
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_PATH}/location/getdeletedlocations`,
-        data,
+        `${
+          import.meta.env.VITE_BACKEND_PATH
+        }/location/getdeletedlocations?page=${page}&limit=${limit}`,
+        { search },
         apiHeader
       );
       return res.data;
@@ -89,9 +95,9 @@ export const deleteLocationbyid = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const res = await axios.put(
-        `${
-          import.meta.env.VITE_BACKEND_PATH
-        }/location/deletelocationbyid/${data.id}`,
+        `${import.meta.env.VITE_BACKEND_PATH}/location/deletelocationbyid/${
+          data.id
+        }`,
         data,
         apiHeader
       );
@@ -119,11 +125,29 @@ export const restoreLocationbyid = createAsyncThunk(
   }
 );
 
+export const getLocationbyCompid = createAsyncThunk(
+  "getLocationbyCompid",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_PATH}/location/getlocationbycompanyId/${
+          data?.id
+        }`,
+        apiHeader
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 const locationSliceDetails = createSlice({
   name: "locationSliceDetails",
   initialState: {
     location: [],
     delLocation: [],
+    totalPages: 0,
+    currentPage: 1,
     locationLoading: false,
     error: null,
   },
@@ -156,12 +180,16 @@ const locationSliceDetails = createSlice({
         state.error = action.payload;
       })
 
+      //get Location with pagination--------------
+
       .addCase(getLocations.pending, (state) => {
         state.locationLoading = true;
       })
       .addCase(getLocations.fulfilled, (state, action) => {
         state.locationLoading = false;
         state.location = action.payload.data;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
         state.error = null;
       })
       .addCase(getLocations.rejected, (state, action) => {
@@ -169,12 +197,16 @@ const locationSliceDetails = createSlice({
         state.error = action.payload;
       })
 
+      //get Deleted Location with pagination--------------
+
       .addCase(getDeletedLocations.pending, (state) => {
         state.locationLoading = true;
       })
       .addCase(getDeletedLocations.fulfilled, (state, action) => {
         state.locationLoading = false;
         state.delLocation = action.payload.data;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
         state.error = null;
       })
       .addCase(getDeletedLocations.rejected, (state, action) => {
@@ -213,10 +245,10 @@ const locationSliceDetails = createSlice({
       })
 
       .addCase(restoreLocationbyid.pending, (state) => {
-        state.compLoading = true;
+        state.locationLoading = true;
       })
       .addCase(restoreLocationbyid.fulfilled, (state, action) => {
-        state.compLoading = false;
+        state.locationLoading = false;
         const { _id } = action.payload.data;
         if (_id) {
           state.delLocation = state.delLocation.filter((f) => f._id !== _id);
@@ -224,7 +256,19 @@ const locationSliceDetails = createSlice({
         }
       })
       .addCase(restoreLocationbyid.rejected, (state, action) => {
-        state.compLoading = false;
+        state.locationLoading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(getLocationbyCompid.pending, (state) => {
+        state.locationLoading = true;
+      })
+      .addCase(getLocationbyCompid.fulfilled, (state, action) => {
+        state.locationLoading = false;
+        state.location = action.payload.data;
+      })
+      .addCase(getLocationbyCompid.rejected, (state, action) => {
+        state.locationLoading = false;
         state.error = action.payload;
       });
   },

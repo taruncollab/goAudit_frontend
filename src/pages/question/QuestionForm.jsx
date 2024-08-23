@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import InputLabel from "@mui/material/InputLabel";
@@ -10,25 +10,28 @@ import {
   IconButton,
   Checkbox,
   FormControlLabel,
-  Box,
   Typography,
-  Divider,
+  Autocomplete,
+  TextField,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import { Label } from "@mui/icons-material";
+
 import {
-  addQuestion,
-  getQuestions,
-  updateQuestionbyid,
-} from "../../apis/questionSlice";
+  Add as AddIcon,
+  Remove as RemoveIcon,
+  ControlPoint as ControlPointIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
+
+import { addQuestion, updateQuestionbyid } from "../../apis/questionSlice";
 import questionCSS from "./question.module.scss";
-import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import { toast } from "react-toastify";
-import { getAllCompanies } from "../../apis/companySlice";
-import { getAllLocations } from "../../apis/locationSlice";
+import { getCompanies } from "../../apis/companySlice";
+import { getLocationbyCompid, getLocations } from "../../apis/locationSlice";
+import { debounce } from "lodash";
+import { getCategories } from "../../apis/categorySlice";
+import Swal from "sweetalert2";
 
 export default function QuestionForm() {
   const types = ["yes/no", "descriptive", "options", "multichoice"];
@@ -36,17 +39,15 @@ export default function QuestionForm() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { auth } = useSelector((state) => state.authData);
-  const { comp } = useSelector((state) => state.companyData);
-  const { location } = useSelector((state) => state.locationData);
-  const { category } = useSelector((state) => state.categoryData);
+
   const { question } = useSelector((state) => state.questionData);
 
   const { id } = useParams();
 
   const [values, setValues] = useState({
-    compId: "",
-    locId: "",
-    categoryId: "",
+    compId: { label: "", value: "" },
+    locId: { label: "", value: "" },
+    categoryId: { label: "", value: "" },
     title: "",
     questions: [
       {
@@ -57,21 +58,126 @@ export default function QuestionForm() {
       },
     ],
   });
+  const [compSearchInput, setCompSearchInput] = useState("");
+  const [compOptions, setCompOptions] = useState([]);
+  const [locationOptions, setLocationOptions] = useState([]);
+  const [categorySearchInput, setCategorySearchInput] = useState("");
+  const [categoryOptions, setCategoryOptions] = useState([]);
 
-  useEffect(() => {
-    const callAPI = () => {
-      dispatch(getAllCompanies());
-      dispatch(getAllLocations());
-    };
-    callAPI();
-  }, []);
+  //Effect Zone----------------------
 
+  //Edit--
   useEffect(() => {
     if (id) {
-      const data = question.find((f) => f._id == id);
+      const data = question && question?.find((f) => f?._id == id);
       setValues(data);
     }
   }, [id]);
+
+  // Company Search-------------------------------------
+
+  const fetchOptions = useCallback(
+    debounce(async (query) => {
+      try {
+        let response;
+
+        if (query?.length === 0) {
+          response = await dispatch(getCompanies({}));
+        } else {
+          response = await dispatch(getCompanies({ search: query }));
+        }
+
+        if (response?.type?.includes("fulfilled")) {
+          const searchData = response?.payload?.data?.map((item) => ({
+            label: item?.name,
+            value: item?._id,
+          }));
+
+          setCompOptions(searchData);
+        }
+      } catch (error) {
+        toast.error("Error fetching options:", error);
+      }
+    }, 1000),
+    [dispatch]
+  );
+
+  useEffect(() => {
+    if (compSearchInput !== undefined) {
+      fetchOptions(compSearchInput);
+    }
+  }, [compSearchInput, fetchOptions]);
+
+  // Location Search-------------------------------------
+
+  // Location Search-------------------------------------
+
+  const fetchLocationOptions = useCallback(
+    debounce(async (query) => {
+      try {
+        let response = await dispatch(getLocationbyCompid({ id: query }));
+
+        if (response?.type?.includes("fulfilled")) {
+          if (response?.payload?.data?.length > 0) {
+            const locationData = response?.payload?.data?.map((item) => ({
+              label: item?.locName,
+              value: item?._id,
+            }));
+
+            setLocationOptions(locationData);
+          } else if (response?.payload?.data?.length == 0) {
+            setLocationOptions([]);
+            toast.warning("No Location Found");
+          }
+        }
+      } catch (error) {
+        toast.error("Error fetching options:", error);
+      }
+    }, 1000),
+    [dispatch, values?.compId?.value]
+  );
+
+  useEffect(() => {
+    if (values?.compId?.value !== undefined) {
+      fetchLocationOptions(values?.compId?.value);
+    }
+  }, [values?.compId?.value, fetchLocationOptions]);
+
+  // Category Search-------------------------------------
+
+  const fetchCategoryOptions = useCallback(
+    debounce(async (query) => {
+      try {
+        let response;
+
+        if (query?.length === 0) {
+          response = await dispatch(getCategories({}));
+        } else {
+          response = await dispatch(getCategories({ search: query }));
+        }
+
+        if (response?.type?.includes("fulfilled")) {
+          const searchData = response?.payload?.data?.map((item) => ({
+            label: item?.name,
+            value: item?._id,
+          }));
+
+          setCategoryOptions(searchData);
+        }
+      } catch (error) {
+        toast.error("Error fetching options:", error);
+      }
+    }, 1000),
+    [dispatch]
+  );
+
+  useEffect(() => {
+    if (categorySearchInput !== undefined) {
+      fetchCategoryOptions(categorySearchInput);
+    }
+  }, [categorySearchInput, fetchCategoryOptions]);
+
+  //-----------------------------------------------------------------
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -85,7 +191,7 @@ export default function QuestionForm() {
     const { value } = event.target;
 
     setValues((prevValues) => {
-      const updatedQuestions = prevValues.questions.map((question, idx) => {
+      const updatedQuestions = prevValues?.questions?.map((question, idx) => {
         if (idx == index) {
           return { ...question, question: value };
         }
@@ -103,12 +209,12 @@ export default function QuestionForm() {
     const { value } = event.target;
 
     setValues((prevValues) => {
-      const updatedQuestions = prevValues.questions.map((question, index) => {
+      const updatedQuestions = prevValues?.questions?.map((question, index) => {
         if (index === questionIndex) {
           return {
             ...question,
             type: value,
-            options: ["options", "multichoice"].includes(value) ? [""] : [],
+            options: ["options", "multichoice"]?.includes(value) ? [""] : [],
           };
         }
         return question;
@@ -121,13 +227,22 @@ export default function QuestionForm() {
     });
   };
 
+  //Handel Pref Ans-----------------------
+
   const handlePrefAnsChange = (questionIndex, value) => {
     setValues((prevValues) => {
-      const updatedQuestions = [...prevValues.questions];
-      updatedQuestions[questionIndex].prefAns = [value]; // Ensure prefAns is an array
+      const updatedQuestions = prevValues?.questions?.map((question, index) => {
+        if (index === questionIndex) {
+          return { ...question, prefAns: [value] };
+        }
+        return question;
+      });
+
       return { ...prevValues, questions: updatedQuestions };
     });
   };
+
+  // Add Question-----------------------
 
   const handleAddQuestion = () => {
     const newQuestion = { question: "", type: "", prefAns: [], options: [] };
@@ -138,11 +253,12 @@ export default function QuestionForm() {
     }));
   };
 
+  // Remove Question-----------------------
   const handleRemoveQuestion = (index) => {
     setValues((prevValues) => {
       const updatedQuestions = [...prevValues.questions];
 
-      updatedQuestions.splice(index, 1);
+      updatedQuestions?.splice(index, 1);
       return {
         ...prevValues,
         questions: updatedQuestions,
@@ -150,10 +266,12 @@ export default function QuestionForm() {
     });
   };
 
+  // Add Option-----------------------
+
   const handleAddOption = (questionIndex) => {
     setValues((prevValues) => {
       const updatedQuestions = [...prevValues.questions];
-      updatedQuestions[questionIndex].options.push("");
+      updatedQuestions[questionIndex].options?.push("");
       return {
         ...prevValues,
         questions: updatedQuestions,
@@ -175,6 +293,7 @@ export default function QuestionForm() {
     });
   };
 
+  // Remove Option-----------------------
   const handleRemoveOption = (questionIndex, optionIndex) => {
     setValues((prevValues) => {
       const updatedQuestions = [...prevValues.questions];
@@ -186,93 +305,46 @@ export default function QuestionForm() {
     });
   };
 
+  // Handle Preferred Answer as Option -----------------------
+
   const handlePreferredOption = (questionIndex, option) => {
     setValues((prevValues) => {
-      const updatedQuestions = [...prevValues.questions];
-      updatedQuestions[questionIndex].prefAns = [option]; // Ensure prefAns is an array
+      const updatedQuestions = prevValues?.questions?.map((question, index) => {
+        if (index === questionIndex) {
+          return { ...question, prefAns: [option] };
+        }
+        return question;
+      });
+
       return { ...prevValues, questions: updatedQuestions };
     });
   };
 
   const handlePreferredChange = (questionIndex, option) => {
+    console.log(option, "option");
     setValues((prevValues) => {
       const updatedQuestions = [...prevValues.questions];
-      const question = updatedQuestions[questionIndex];
+
+      const question = { ...updatedQuestions[questionIndex] };
 
       // Toggle the option in prefAns array
-      if (question?.prefAns?.includes(option)) {
+      if (question.prefAns.includes(option)) {
+        // Remove the option if it exists
         question.prefAns = question.prefAns.filter((item) => item !== option);
       } else {
+        // Add the option if it doesn't exist
         question.prefAns = [...question.prefAns, option];
       }
 
+      // Update the question in the array
+      updatedQuestions[questionIndex] = question;
+
+      // Return the new state object
       return { ...prevValues, questions: updatedQuestions };
     });
   };
 
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
-  //   if (id) {
-  //     const res = await dispatch(
-  //       updateQuestionbyid({ ...values, createdBy: auth._id })
-  //     );
-  //     if (res.type.includes("fulfilled")) {
-  //       navigate("/question");
-  //       setValues({});
-  //       toast.success(res.payload.message);
-  //     }
-  //   } else {
-  //     if (values.compId == "") {
-  //       toast.warning("Please Select Company");
-  //     } else if (values.locId == "") {
-  //       toast.warning("Please Select Location");
-  //     } else if (values.categoryId == "") {
-  //       toast.warning("Please Select Category");
-  //     } else if (values.title == "") {
-  //       toast.warning("Please Enter a Title");
-  //     } else if (values.questions.length >= 1) {
-  //       if (
-  //         values.questions.map((q) => {
-  //           q?.question === "";
-  //         })
-  //       ) {
-  //         toast.warning("Please Enter Question");
-  //       } else if (
-  //         values.questions.map(q => q.type == "")
-  //       ) {
-  //         toast.warning("Please Select Question Type");
-  //       } else if (
-  //         values.questions.map(q => q.type == "yes/no" && q.prefAns.length < 1)
-  //       ) {
-  //         toast.warning("Please Select Preferred answer");
-  //       } else if (
-  //         values.questions.map(q => q.type == "options" && q.options && q.options.map(o => o == ""))
-  //       ) {
-  //         toast.warning("Please Enter Option");
-  //         if (values.questions.map(q => q.options.map(o => o != "") && q.prefAns.length < 1)) {
-  //           toast.warning("Please Select Preferred answer");
-  //         }
-  //       } else if (
-  //         values.questions.map(q => q.type == "multichoice" && q.options && q.options.map(o => o == ""))
-  //       ) {
-  //         toast.warning("Please Enter Option");
-  //         if (values.questions.map(q => q.options.map(o => o != "") && q.prefAns.length < 1)) {
-  //           toast.warning("Please Select Preferred answer");
-  //         }
-  //       }
-  //     } else {
-  //       const res = await dispatch(
-  //         addQuestion({ ...values, createdBy: auth._id })
-  //       );
-  //       if (res.type.includes("fulfilled")) {
-  //         navigate("/question");
-  //         setValues({});
-  //         toast.success(res.payload.message);
-  //       }
-
-  //     }
-  //   }
-  // };
+  // Handle Submit-------------------------------
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -283,41 +355,75 @@ export default function QuestionForm() {
     if (!values.categoryId) return toast.warning("Please Select Category");
     if (!values.title) return toast.warning("Please Enter a Title");
 
-    const hasInvalidQuestion = values.questions.some(q => {
-        if (!q.question) return true;
-        if (!q.type) return true;
-        if (q.type === "yes/no" && !q.prefAns.length) return true;
-        if ((q.type === "options" || q.type === "multichoice") && !q.options.length) return true;
-        if ((q.type === "options" || q.type === "multichoice") && q.options.some(o => !o)) return true;
-        if ((q.type === "options" || q.type === "multichoice") && !q.prefAns.length) return true;
-        return false;
+    const hasInvalidQuestion = values?.questions?.some((q) => {
+      if (!q.question) return true;
+      if (!q.type) return true;
+      if (q.type === "yes/no" && !q.prefAns.length) return true;
+      if (
+        (q.type === "options" || q.type === "multichoice") &&
+        !q.options.length
+      )
+        return true;
+      if (
+        (q.type === "options" || q.type === "multichoice") &&
+        q.options.some((o) => !o)
+      )
+        return true;
+      if (
+        (q.type === "options" || q.type === "multichoice") &&
+        !q.prefAns.length
+      )
+        return true;
+      return false;
     });
 
-    if (hasInvalidQuestion) return toast.warning("Please fill all fields correctly");
+    if (hasInvalidQuestion)
+      return toast.warning("Please fill all fields correctly");
 
-    // Submit form
+    // Submit form--------------------------
+
     const action = id ? updateQuestionbyid : addQuestion;
-    const res = await dispatch(action({ ...values, createdBy: auth._id }));
+    const res = await dispatch(action({ ...values, createdBy: auth?._id }));
 
     if (res.type.includes("fulfilled")) {
-        navigate("/question");
-        setValues({
-            compId: "",
-            locId: "",
-            categoryId: "",
-            title: "",
-            questions: [{ question: "", type: "", prefAns: [], options: [] }],
-        });
-        toast.success(res.payload.message);
+      navigate("/question");
+      setValues({
+        compId: { label: "", value: "" },
+        locId: { label: "", value: "" },
+        categoryId: { label: "", value: "" },
+        title: "",
+        questions: [{ question: "", type: "", prefAns: [], options: [] }],
+      });
+      Swal.fire({
+        title: "Success",
+        text: res.payload.message,
+        icon: "success",
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
     }
-};
-
+  };
 
   return (
     <>
       <Grid>
-        <Typography className={questionCSS.title}>QUESTION</Typography>
-        <Grid item md={12} mx={3} mt={4} mb={4} className={questionCSS.main}>
+        <Grid item md={12} mx={3} mt={2} mb={4} className={questionCSS.main}>
+          <div className={questionCSS.header}>
+            <Typography className={questionCSS.title}>
+              {" "}
+              <img
+                src="/src/assets/Question.png"
+                style={{ width: "28px", height: "28px", marginRight: "5px" }}
+              />
+              {id ? "EDIT" : "ADD"} QUESTION
+            </Typography>
+
+            <img
+              src="/img/addQuestion.gif"
+              className={questionCSS.questionimage}
+            />
+          </div>
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
@@ -325,27 +431,35 @@ export default function QuestionForm() {
                   <InputLabel htmlFor="compId" className={questionCSS.outLabel}>
                     Company
                   </InputLabel>
-                  <Select
+
+                  <Autocomplete
                     id="compId"
                     name="compId"
-                    value={values?.compId}
-                    size="small"
-                    fullWidth
-                    onChange={handleChange}
-                    displayEmpty
-                  >
-                    <MenuItem value="" disabled>
-                      <p className={questionCSS.inLabel}>Select Company</p>
-                    </MenuItem>
-                    {comp &&
-                      comp.map((c, index) => {
-                        return (
-                          <MenuItem key={index} value={c?._id}>
-                            {c?.name}
-                          </MenuItem>
-                        );
-                      })}
-                  </Select>
+                    options={compOptions}
+                    getOptionLabel={(option) => option?.label || ""}
+                    value={values?.compId || null}
+                    onChange={(event, newValue) => {
+                      handleChange({
+                        target: {
+                          name: "compId",
+                          value: newValue || "",
+                        },
+                      });
+                    }}
+                    inputValue={compSearchInput}
+                    onInputChange={(event, newInputValue) => {
+                      setCompSearchInput(newInputValue);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Select Company"
+                        size="small"
+                        variant="outlined"
+                        fullWidth
+                      />
+                    )}
+                  />
                 </Stack>
               </Grid>
               <Grid item xs={12} md={6}>
@@ -353,61 +467,71 @@ export default function QuestionForm() {
                   <InputLabel htmlFor="locId" className={questionCSS.outLabel}>
                     Location
                   </InputLabel>
-                  <Select
+
+                  <Autocomplete
                     id="locId"
                     name="locId"
-                    value={values?.locId}
-                    size="small"
-                    fullWidth
-                    onChange={handleChange}
-                    displayEmpty
-                  >
-                    <MenuItem value="" disabled>
-                      <p className={questionCSS.inLabel}>Select Location</p>
-                    </MenuItem>
-                    {location &&
-                      location
-                        ?.filter((l) => values?.compId === l?.compId)
-                        .map((l, index) => (
-                          <MenuItem key={index} value={l?._id}>
-                            {l?.locName}
-                          </MenuItem>
-                        ))}
-                  </Select>
+                    options={locationOptions}
+                    getOptionLabel={(option) => option?.label || ""}
+                    value={values?.locId || null}
+                    onChange={(event, newValue) => {
+                      handleChange({
+                        target: {
+                          name: "locId",
+                          value: newValue || "",
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Select Location"
+                        size="small"
+                        variant="outlined"
+                        fullWidth
+                      />
+                    )}
+                  />
                 </Stack>
               </Grid>
 
               <Grid item xs={12} md={6}>
                 <Stack gap={0.3} ml={{ xs: 2, md: 5 }} mr={{ xs: 2, md: 1 }}>
-                  <InputLabel
-                    htmlFor="categoryId"
-                    className={questionCSS.outLabel}
-                  >
+                  <InputLabel htmlFor="locId" className={questionCSS.outLabel}>
                     Category
                   </InputLabel>
-                  <Select
+
+                  <Autocomplete
                     id="categoryId"
                     name="categoryId"
-                    value={values?.categoryId}
-                    size="small"
-                    fullWidth
-                    onChange={handleChange}
-                    displayEmpty
-                  >
-                    <MenuItem value="" disabled>
-                      <p className={questionCSS.inLabel}>Select Category</p>
-                    </MenuItem>
-                    {category &&
-                      category.map((c, index) => {
-                        return (
-                          <MenuItem key={index} value={c?._id}>
-                            {c?.name}
-                          </MenuItem>
-                        );
-                      })}
-                  </Select>
+                    options={categoryOptions || []}
+                    getOptionLabel={(option) => option?.label || ""}
+                    value={values?.categoryId || null}
+                    onChange={(event, newValue) => {
+                      handleChange({
+                        target: {
+                          name: "categoryId",
+                          value: newValue || "",
+                        },
+                      });
+                    }}
+                    inputValue={categorySearchInput}
+                    onInputChange={(event, newInputValue) => {
+                      setCategorySearchInput(newInputValue);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Select Category"
+                        size="small"
+                        variant="outlined"
+                        fullWidth
+                      />
+                    )}
+                  />
                 </Stack>
               </Grid>
+
               <Grid item xs={12} md={6}>
                 <Stack gap={0.3} ml={{ xs: 2, md: 1 }} mr={{ xs: 2, md: 5 }}>
                   <InputLabel htmlFor="title" className={questionCSS.outLabel}>
@@ -429,22 +553,10 @@ export default function QuestionForm() {
                 </Stack>
               </Grid>
 
-              {/* <div
-                style={{
-                  border: "none",
-                  borderTop: "1px dotted #878787",
-                  marginTop: "20px",
-                  paddingLeft: "30px",
-                  width: "98%",
-                  visibility: "visible",
-                  zIndex: '100'
-                }}
-              ></div> */}
-
               {values?.questions?.map((question, index) => {
                 return (
                   <>
-                    <Grid item xs={12} md={12} key={index}>
+                    <Grid item xs={12} md={12} key={index} mt={2}>
                       <Grid container>
                         <Grid item xs={12} md={6}>
                           <Stack
@@ -502,7 +614,7 @@ export default function QuestionForm() {
                                   Type of question
                                 </p>
                               </MenuItem>
-                              {types.map((type, i) => (
+                              {types?.map((type, i) => (
                                 <MenuItem key={i} value={type}>
                                   {type}
                                 </MenuItem>
@@ -514,7 +626,7 @@ export default function QuestionForm() {
                         {/* option select add option */}
                         {question.type === "options" && (
                           <Grid item xs={12} md={11}>
-                            {question?.options.map((option, optionIndex) => (
+                            {question?.options?.map((option, optionIndex) => (
                               <Grid
                                 container
                                 item
@@ -584,9 +696,11 @@ export default function QuestionForm() {
                           </Grid>
                         )}
 
-                        {question.type == "multichoice" && (
+                        {/* --============== Multi Choice Option---======================== */}
+
+                        {question?.type == "multichoice" && (
                           <Grid item xs={12} md={11}>
-                            {question?.options.map((option, optionIndex) => (
+                            {question?.options?.map((option, optionIndex) => (
                               <Grid
                                 container
                                 item
@@ -613,6 +727,9 @@ export default function QuestionForm() {
                                     placeholder={`Option ${optionIndex + 1}`}
                                   />
                                 </Grid>
+
+                                {/* Checkbox--------- */}
+
                                 <Grid
                                   item
                                   container
@@ -629,6 +746,8 @@ export default function QuestionForm() {
                                       handlePreferredChange(index, option)
                                     }
                                   />
+
+                                  {/* Add Button --------*/}
                                   <Grid mr={1}>
                                     <IconButton
                                       fullWidth
@@ -638,6 +757,8 @@ export default function QuestionForm() {
                                       <AddIcon className={questionCSS.plus} />
                                     </IconButton>
                                   </Grid>
+
+                                  {/* Remove Button----------- */}
                                   <Grid>
                                     {optionIndex > 0 && (
                                       <IconButton
@@ -658,7 +779,9 @@ export default function QuestionForm() {
                           </Grid>
                         )}
 
-                        {question.type === "yes/no" && (
+                        {/* --============== yes/no Option---======================== */}
+
+                        {question?.type === "yes/no" && (
                           <Grid container alignItems={"center"} mt={2} ml={5}>
                             <Typography mr={2} className={questionCSS.outLabel}>
                               Preferred Answer:
@@ -666,7 +789,9 @@ export default function QuestionForm() {
                             <FormControlLabel
                               control={
                                 <Checkbox
-                                  checked={question.prefAns.includes("yes")}
+                                  checked={values?.questions[
+                                    index
+                                  ]?.prefAns?.includes("yes")}
                                   onChange={() =>
                                     handlePrefAnsChange(index, "yes")
                                   }
@@ -678,7 +803,9 @@ export default function QuestionForm() {
                             <FormControlLabel
                               control={
                                 <Checkbox
-                                  checked={question.prefAns.includes("no")}
+                                  checked={values.questions[
+                                    index
+                                  ]?.prefAns?.includes("no")}
                                   onChange={() =>
                                     handlePrefAnsChange(index, "no")
                                   }
@@ -703,9 +830,9 @@ export default function QuestionForm() {
                           {index > 0 && (
                             <Button
                               onClick={() => handleRemoveQuestion(index)}
-                              className={questionCSS.cancel}
+                              className={questionCSS.remove}
                             >
-                              Remove
+                              <DeleteIcon />
                             </Button>
                           )}
                         </Grid>
@@ -745,9 +872,6 @@ export default function QuestionForm() {
                   variant="contained"
                   className={questionCSS.cancel}
                   onClick={() => {
-                    // id
-                    //   ? navigate(`/questiondetails/${id}`)
-                    //   :
                     navigate("/question");
                   }}
                 >

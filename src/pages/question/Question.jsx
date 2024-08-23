@@ -1,90 +1,61 @@
 import {
   Box,
   Button,
-  Card,
+  Chip,
   Grid,
   IconButton,
-  Paper,
+  Pagination,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { DataGrid, GridDeleteIcon } from "@mui/x-data-grid";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-import EditIcon from "@mui/icons-material/Edit";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import questionCSS from "./question.module.scss";
 import { deleteQuestionbyid, getQuestions } from "../../apis/questionSlice";
-import { toast } from "react-toastify";
+import useHandleDelete from "../../common/DeleteFunction";
+import LoadingTable from "../../common/loadingTable";
+import {
+  Edit as EditIcon,
+  Visibility as VisibilityIcon,
+  CorporateFare as CorporateFareIcon,
+  LocationOn as LocationOnIcon,
+  Category as CategoryIcon,
+  ReceiptLong as ReceiptLongIcon,
+} from "@mui/icons-material";
 
 const Question = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [data, setData] = useState(0);
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(5);
-  const [count, setCount] = useState(0);
-
-  const { users } = useSelector((state) => state.authData);
-  const { comp, delComp } = useSelector((state) => state.companyData);
-  const { question } = useSelector((state) => state.questionData);
-  const { location } = useSelector((state) => state.locationData);
-  const { category } = useSelector((state) => state.categoryData);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { users } = useSelector((state) => state.authData);
+  const { question, totalPages, questionLoading } = useSelector(
+    (state) => state.questionData
+  );
 
+  // State Zone--------------------------
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  //Effect Zone---------------------
   useEffect(() => {
-    const callApi = async () => {
-      const res = await dispatch(
-        getQuestions({ page, pageSize, search: searchTerm })
-      );
+    dispatch(getQuestions({ page: currentPage, limit: 5, search: searchTerm }));
+  }, [dispatch, currentPage, searchTerm]);
 
-      setData(res?.payload?.data);
-      setCount(res?.payload?.totalCount);
-    };
-    callApi();
-  }, [page, pageSize, searchTerm, dispatch]);
+  //---For Pagination-----
 
-  const handlePaginationModelChange = (model) => {
-    setPage(model.page);
-    setPageSize(model.pageSize);
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
   };
 
-  const handleDelete = async (id) => {
-
-    swal({
-      title: "Are you sure?",
-      text: "Do you want to Delete this file!!?",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
-    })
-    .then(async(willDelete) => {
-      if (willDelete) {
-        const res = await dispatch(deleteQuestionbyid(id));
-    if (res.type.includes("fulfilled")) {
-      toast.warning(res.payload.message);
-    }
-
-    const recall = await dispatch(
-      getQuestions({ page, pageSize, search: searchTerm })
-    );
-
-    setCount(recall?.payload?.totalCount);
-    setData(recall?.payload?.data);
-      } else {
-        swal("Cancelled!");
-      }
-    });
-    
-  };
+  //Handle Delete===================
+  const handleDelete = useHandleDelete(deleteQuestionbyid, "Question");
 
   const searchData = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
   };
-
-  // let companyArray = [...comp, ...delComp];
 
   const columns = [
     {
@@ -107,24 +78,26 @@ const Question = () => {
           <IconButton
             className={questionCSS.editBtnBG}
             size="small"
-            onClick={() => navigate(`/questionform/${params.row._id}`)}
+            onClick={() => navigate(`/questionform/${params.row?._id}`)}
           >
             <EditIcon className={questionCSS.editBtn} />
           </IconButton>
           <IconButton
             className={questionCSS.deleteBtnBG}
             size="small"
-            onClick={() => handleDelete(params.row._id)}
+            onClick={() => handleDelete(params.row?._id)}
           >
             <GridDeleteIcon className={questionCSS.deleteBtn} />
           </IconButton>
-          <IconButton
-            className={questionCSS.viewBtnBG}
-            size="small"
-            onClick={() => navigate(`/questiondetails/${params.row._id}`)}
-          >
-            <VisibilityIcon className={questionCSS.viewBtn} />
-          </IconButton>
+          <Tooltip title="View Info">
+            <IconButton
+              className={questionCSS.viewBtnBG}
+              size="small"
+              onClick={() => navigate(`/questiondetails/${params.row?._id}`)}
+            >
+              <VisibilityIcon className={questionCSS.viewBtn} />
+            </IconButton>
+          </Tooltip>
         </Stack>
       ),
     },
@@ -133,7 +106,7 @@ const Question = () => {
       headerName: <b>TITLE</b>,
       headerAlign: "center",
       headerClassName: questionCSS.headers,
-      align: "center",
+      align: "left",
       disableColumnMenu: true,
       sortable: false,
       width: 200,
@@ -143,62 +116,68 @@ const Question = () => {
       headerName: <b>CATEGORY</b>,
       headerAlign: "center",
       headerClassName: questionCSS.headers,
-      align: "center",
+      align: "left",
       disableColumnMenu: true,
       sortable: false,
       width: 200,
-      renderCell: (params) => (
-        <div>
-          {category &&
-            category.map((f, i) => {
-              if (f._id === params.row.categoryId) {
-                return <p key={i}>{f.name}</p>;
-              }
-            })}
-        </div>
-      ),
+      renderCell: (params) => {
+        return (
+          <Chip
+            label={params?.row?.categoryId?.label || "No Category Name"}
+            variant="outlined"
+            sx={{ borderColor: "#0672BC", color: "#0672BC" }}
+            icon={<CategoryIcon />}
+          />
+        );
+      },
     },
     {
-      field: "compName",
+      field: "compId",
       headerName: (
         <b>
-          COMPANY/ <br /> DEPARTMENT
+          <span>
+            COMPANY/
+            <br />
+            DEPARTMENT
+          </span>
         </b>
       ),
       headerAlign: "center",
       headerClassName: questionCSS.headers,
-      align: "center",
       disableColumnMenu: true,
       sortable: false,
-      width: 200,
-      // renderCell: (params) => (
-      //   <div>
-      //     {companyArray.map((f, i) => {
-      //       if (f._id === params.row.compId) {
-      //         return <p key={i}  style={{ color: f.isDelete == 1 ? "red" : "" }}>{f.name}</p>;
-      //       }
-      //     })}
-      //   </div>
-      // ),
+      align: "left",
+      width: 270,
+      renderCell: (params) => {
+        return (
+          <Chip
+            label={params?.row?.compId?.label || "No Company Name"}
+            variant="outlined"
+            sx={{ borderColor: "#0672BC", color: "#0672BC" }}
+            icon={<CorporateFareIcon />}
+          />
+        );
+      },
     },
     {
-      field: "locName",
+      field: "locId",
       headerName: <b>LOCATION </b>,
       headerAlign: "center",
       headerClassName: questionCSS.headers,
-      align: "center",
+      align: "left",
       disableColumnMenu: true,
       sortable: false,
       width: 200,
-      // renderCell: (params) => (
-      //   <div>
-      //     {location.map((f, i) => {
-      //       if (f._id === params.row.locId) {
-      //         return <p key={i}>{f.locName}</p>;
-      //       }
-      //     })}
-      //   </div>
-      // ),
+      renderCell: (params) => {
+        return (
+          <Chip
+            label={params?.row?.locId?.label || "No Location"}
+            variant="outlined"
+            sx={{ borderColor: "#0672BC", color: "#0672BC" }}
+            icon={<LocationOnIcon />}
+          />
+        );
+      },
     },
     {
       field: "createdBy",
@@ -212,7 +191,7 @@ const Question = () => {
       renderCell: (params) => (
         <div>
           {users &&
-            users.map((f, i) => {
+            users?.map((f, i) => {
               if (f._id === params.row.createdBy) {
                 return <p key={i}>{f.name}</p>;
               }
@@ -225,14 +204,14 @@ const Question = () => {
   return (
     <>
       <Grid container>
-        <Grid item xs={12} container justifyContent={"space-between"}>
+        <Grid item xs={12} mt={2} container justifyContent={"space-between"}>
           <Typography className={questionCSS.title}>QUESTION</Typography>
           <Button
             variant="contained"
             className={`me-4 ${questionCSS.addBtn}`}
             onClick={() => navigate("/questionform")}
           >
-            Add
+            <ReceiptLongIcon sx={{ mr: 1 }} /> Add
           </Button>
         </Grid>
 
@@ -255,45 +234,66 @@ const Question = () => {
           />
         </Grid>
 
-        <Grid item md={12} xs={12} mr={3} ml={3} mt={3}>
-          <DataGrid
-            rows={data || []}
-            columns={columns}
-            className={questionCSS.mainGrid}
-            rowCount={count}
-            autoWidth
-            autoHeight
-            sx={{
-              margin: 0,
-              "& .MuiDataGrid-root": {
-                padding: 0,
-              },
-              "& .MuiDataGrid-filler": {
-                backgroundColor: "#1182C574",
-              },
-            }}
-            pagination
-            paginationMode="server"
-            initialState={{
-              ...data.initialState,
-              pagination: {
-                ...data.initialState?.pagination,
-                paginationModel: {
-                  pageSize: pageSize,
-                  page: page,
+        <Grid item md={12} xs={12} ml={4} mt={3} mr={3}>
+          {questionLoading ? (
+            <LoadingTable />
+          ) : question && question?.length > 0 ? (
+            <DataGrid
+              rows={question}
+              columns={columns}
+              className={questionCSS.mainGrid}
+              autoHeight
+              autoWidth
+              pagination={false}
+              sx={{
+                margin: 0,
+                "& .MuiDataGrid-root": {
+                  padding: 0,
                 },
-              },
-            }}
-            pageSizeOptions={[pageSize]}
-            onPageChange={(newPage) => setPage(newPage)}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            onPaginationModelChange={handlePaginationModelChange}
-            rowsPerPageOptions={[5]}
-            getRowId={(e) => e._id}
-            disableRowSelectionOnClick
-          />
+                "& .MuiDataGrid-filler": {
+                  backgroundColor: "#1182C574",
+                },
+              }}
+              getRowId={(e) => e?._id}
+              disableRowSelectionOnClick
+            />
+          ) : (
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="100%"
+            >
+              <img
+                src="/img/No data.gif"
+                alt="No data available"
+                height="200"
+              />
+            </Box>
+          )}
         </Grid>
       </Grid>
+
+      <Box className="mt-3 mb-3">
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={handlePageChange}
+          sx={{
+            "& .MuiPaginationItem-root": {
+              color: "#0672bc",
+            },
+            "& .MuiPaginationItem-page.Mui-selected": {
+              backgroundColor: "#0672bc",
+              color: "black",
+            },
+            "& .MuiPaginationItem-page:hover": {
+              backgroundColor: "#0672bc",
+              color: "black",
+            },
+          }}
+        />
+      </Box>
     </>
   );
 };

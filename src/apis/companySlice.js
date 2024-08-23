@@ -18,6 +18,27 @@ export const addCompany = createAsyncThunk(
   }
 );
 
+export const getCompanies = createAsyncThunk(
+  "getCompanies",
+  async ({ page = 1, limit = 5, search = "" }, { rejectWithValue }) => {
+    try {
+      // Make POST request to fetch companies
+      const res = await axios.post(
+        `${
+          import.meta.env.VITE_BACKEND_PATH
+        }/company/getcomps?page=${page}&limit=${limit}`,
+        { search },
+        apiHeader
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response ? error.response.data : { message: error.message }
+      );
+    }
+  }
+);
+
 export const getAllCompanies = createAsyncThunk(
   "getAllCompanies",
   async (data, { rejectWithValue }) => {
@@ -34,34 +55,23 @@ export const getAllCompanies = createAsyncThunk(
   }
 );
 
-export const getCompanies = createAsyncThunk(
-  "getCompanies",
-  async (data, { rejectWithValue }) => {
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_PATH}/company/getcomps`,
-        data,
-        apiHeader
-      );
-      return res.data;
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
-
 export const getDeletedCompanies = createAsyncThunk(
   "getDeletedCompanies",
-  async (data, { rejectWithValue }) => {
+  async ({ page = 1, limit = 5, search = "" }, { rejectWithValue }) => {
     try {
+      // Make POST request to fetch companies
       const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_PATH}/company/getdeletedcomps`,
-        data,
+        `${
+          import.meta.env.VITE_BACKEND_PATH
+        }/company/getdeletedcomps?page=${page}&limit=${limit}`,
+        { search },
         apiHeader
       );
       return res.data;
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue(
+        error.response ? error.response.data : { message: error.message }
+      );
     }
   }
 );
@@ -97,6 +107,7 @@ export const deleteCompanybyid = createAsyncThunk(
       );
       return res.data;
     } catch (error) {
+      console.log(error);
       return rejectWithValue(error);
     }
   }
@@ -124,6 +135,8 @@ const companySliceDetails = createSlice({
     delComp: [],
     compLoading: false,
     error: null,
+    totalPages: 0,
+    currentPage: 1,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -133,10 +146,27 @@ const companySliceDetails = createSlice({
       })
       .addCase(addCompany.fulfilled, (state, action) => {
         state.compLoading = false;
-        state.comp.push(action.payload.data);
+        state.comp.unshift(action.payload.data);
         state.error = null;
       })
       .addCase(addCompany.rejected, (state, action) => {
+        state.compLoading = false;
+        state.error = action.payload;
+      })
+
+      //get Company with pagination--------------
+
+      .addCase(getCompanies.pending, (state) => {
+        state.compLoading = true;
+      })
+      .addCase(getCompanies.fulfilled, (state, action) => {
+        state.compLoading = false;
+        state.comp = action.payload.data;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
+        state.error = null;
+      })
+      .addCase(getCompanies.rejected, (state, action) => {
         state.compLoading = false;
         state.error = action.payload;
       })
@@ -154,18 +184,7 @@ const companySliceDetails = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(getCompanies.pending, (state) => {
-        state.compLoading = true;
-      })
-      .addCase(getCompanies.fulfilled, (state, action) => {
-        state.compLoading = false;
-        state.comp = action.payload.data;
-        state.error = null;
-      })
-      .addCase(getCompanies.rejected, (state, action) => {
-        state.compLoading = false;
-        state.error = action.payload;
-      })
+      //get Deleted Company with pagination--------------
 
       .addCase(getDeletedCompanies.pending, (state) => {
         state.compLoading = true;
@@ -173,6 +192,8 @@ const companySliceDetails = createSlice({
       .addCase(getDeletedCompanies.fulfilled, (state, action) => {
         state.compLoading = false;
         state.delComp = action.payload.data;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
         state.error = null;
       })
       .addCase(getDeletedCompanies.rejected, (state, action) => {

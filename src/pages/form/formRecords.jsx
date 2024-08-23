@@ -1,50 +1,57 @@
-import { Button, Grid, IconButton, Paper, Stack, TextField, Typography } from "@mui/material";
-import { DataGrid, GridDeleteIcon } from "@mui/x-data-grid";
-// import { deleteQuestionbyid } from 'apis/questionSlice';
-import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Chip,
+  Grid,
+  IconButton,
+  Pagination,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import formCSS from "./form.module.scss";
 import { getForms } from "../../apis/formSlice";
+import LoadingTable from "../../common/loadingTable";
+import {
+  CorporateFare as CorporateFareIcon,
+  LocationOn as LocationOnIcon,
+  Category as CategoryIcon,
+  ReceiptLong as ReceiptLongIcon,
+  RemoveRedEye as RemoveRedEyeIcon,
+} from "@mui/icons-material";
 
 const FormRecords = () => {
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [data, setData] = useState(0);
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(5);
-  const [count, setCount] = useState(0);
-
-  const { users } = useSelector((state) => state.authData);
-  const { question } = useSelector((state) => state.questionData);
-  const { form } = useSelector((state) => state.formData);
-  const { comp, delComp } = useSelector((state) => state.companyData);
-  const { location } = useSelector((state) => state.locationData);
-  const { category } = useSelector((state) => state.categoryData);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const { users } = useSelector((state) => state.authData);
+  const { form, totalPages, formLoading } = useSelector(
+    (state) => state.formData
+  );
+
+  //State Zone---------------------
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  //Effect Zone---------------------
+
   useEffect(() => {
-    const callApi = async() => {
-      const res = await dispatch(getForms({ page, pageSize, search: searchTerm}));
+    dispatch(getForms({ page: currentPage, limit: 5, search: searchTerm }));
+  }, [dispatch, currentPage, searchTerm]);
 
-      setData(res?.payload?.data);
-      setCount(res?.payload?.totalCount);
-    }
-    callApi();
-  }, [page, pageSize, searchTerm, dispatch]);
+  //---For Pagination--
 
-  const handlePaginationModelChange = (model) => {
-    setPage(model.page);
-    setPageSize(model.pageSize);
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
   };
 
   const searchData = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
   };
-
-  // let companyArray = [...comp, ...delComp];
 
   const columns = [
     {
@@ -58,11 +65,13 @@ const FormRecords = () => {
       width: 100,
       renderCell: (params) => (
         <div>
-          <IconButton
-            onClick={() => navigate(`/formdetails/${params.row._id}`)}
-          >
-            <InfoOutlinedIcon className={formCSS.infoBtn}/>
-          </IconButton>
+          <Tooltip title="View Details">
+            <IconButton
+              onClick={() => navigate(`/formdetails/${params.row?._id}`)}
+            >
+              <RemoveRedEyeIcon className={formCSS.infoBtn} />
+            </IconButton>
+          </Tooltip>
         </div>
       ),
     },
@@ -71,7 +80,7 @@ const FormRecords = () => {
       headerName: <b>TITLE</b>,
       headerAlign: "center",
       headerClassName: formCSS.headers,
-      align: "center",
+      align: "left",
       disableColumnMenu: true,
       sortable: false,
       width: 200,
@@ -81,61 +90,68 @@ const FormRecords = () => {
       headerName: <b>CATEGORY</b>,
       headerAlign: "center",
       headerClassName: formCSS.headers,
-      align: "center",
+      align: "left",
       disableColumnMenu: true,
       sortable: false,
-      width: 160,
-      renderCell: (params) => (
-        <div>
-          {category.map((f, i) => {
-            if (f._id === params.row.categoryId) {
-              return <p key={i}>{f.name}</p>;
-            }
-          })}
-        </div>
-      ),
+      width: 200,
+      renderCell: (params) => {
+        return (
+          <Chip
+            label={params?.row?.categoryId?.label || "No Category Name"}
+            variant="outlined"
+            sx={{ borderColor: "#0672BC", color: "#0672BC" }}
+            icon={<CategoryIcon />}
+          />
+        );
+      },
     },
     {
-      field: "compName",
+      field: "compId",
       headerName: (
         <b>
-          COMPANY/ <br /> DEPARTMENT
+          <span>
+            COMPANY/
+            <br />
+            DEPARTMENT
+          </span>
         </b>
       ),
       headerAlign: "center",
       headerClassName: formCSS.headers,
-      align: "center",
       disableColumnMenu: true,
       sortable: false,
-      width: 220,
-      // renderCell: (params) => (
-      //   <div>
-      //     {companyArray.map((f, i) => {
-      //       if (f._id === params.row.compId) {
-      //         return <p key={i}  style={{ color: f.isDelete == 1 ? "red" : "" }}>{f.name}</p>;
-      //       }
-      //     })}
-      //   </div>
-      // ),
+      align: "left",
+      width: 270,
+      renderCell: (params) => {
+        return (
+          <Chip
+            label={params?.row?.compId?.label || "No Company Name"}
+            variant="outlined"
+            sx={{ borderColor: "#0672BC", color: "#0672BC" }}
+            icon={<CorporateFareIcon />}
+          />
+        );
+      },
     },
     {
-      field: "locName",
+      field: "locId",
       headerName: <b>LOCATION </b>,
       headerAlign: "center",
       headerClassName: formCSS.headers,
-      align: "center",
+      align: "left",
       disableColumnMenu: true,
       sortable: false,
-      width: 160,
-      // renderCell: (params) => (
-      //   <div>
-      //     {location.map((f, i) => {
-      //       if (f._id === params.row.locId) {
-      //         return <p key={i}>{f.locName}</p>;
-      //       }
-      //     })}
-      //   </div>
-      // ),
+      width: 200,
+      renderCell: (params) => {
+        return (
+          <Chip
+            label={params?.row?.locId?.label || "No Location"}
+            variant="outlined"
+            sx={{ borderColor: "#0672BC", color: "#0672BC" }}
+            icon={<LocationOnIcon />}
+          />
+        );
+      },
     },
     {
       field: "createdBy",
@@ -148,11 +164,12 @@ const FormRecords = () => {
       width: 160,
       renderCell: (params) => (
         <div>
-          {users && users.map((f, i) => {
-            if (f._id === params.row.createdBy) {
-              return <p key={i}>{f.name}</p>;
-            }
-          })}
+          {users &&
+            users.map((f, i) => {
+              if (f._id === params.row.createdBy) {
+                return <p key={i}>{f.name}</p>;
+              }
+            })}
         </div>
       ),
     },
@@ -171,67 +188,90 @@ const FormRecords = () => {
   return (
     <>
       <Grid container>
-        <Grid item xs={12} container justifyContent={"space-between"}>
-          <Typography className={formCSS.title}>FORM RECORD</Typography>
+        <Grid item xs={12} mt={2} container justifyContent={"space-between"}>
+          <Typography className={formCSS.title}>
+            <ReceiptLongIcon style={{ fontSize: "26px" }} /> FORM RECORD
+          </Typography>
         </Grid>
 
         <Grid item md={4} xs={10} ml={4} mt={2} mr={3}>
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Search Form Records"
-          onChange={searchData}
-          className={formCSS.searchBar}
-          InputProps={{
-            disableUnderline: true,
-            sx: {
-              border: "none",
-              "& .MuiOutlinedInput-notchedOutline": {
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Search Form Records"
+            onChange={searchData}
+            className={formCSS.searchBar}
+            InputProps={{
+              disableUnderline: true,
+              sx: {
                 border: "none",
-              },
-            },
-          }}
-        />
-      </Grid>
-
-        <Grid item md={12} xs={12} ml={3} mt={3} mr={3}>
-          <DataGrid
-            rows={data || []}
-            columns={columns}
-            className={formCSS.mainGrid}
-            rowCount={count}
-            autoWidth
-            autoHeight
-            sx={{
-              margin: 0,
-              "& .MuiDataGrid-root": {
-                padding: 0,
-              },
-              "& .MuiDataGrid-filler": {
-                backgroundColor: "#1182C574",
-              },
-            }}
-            pagination
-            paginationMode="server"
-            initialState={{
-              ...data.initialState,
-              pagination: {
-                ...data.initialState?.pagination,
-                paginationModel: {
-                  pageSize: pageSize,
-                  page: page 
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
                 },
               },
             }}
-            pageSizeOptions={[pageSize]}
-            onPageChange={(newPage) => setPage(newPage)}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            onPaginationModelChange={handlePaginationModelChange}
-            rowsPerPageOptions={[5]}
-            getRowId={(e) => e._id}
-            disableRowSelectionOnClick
           />
         </Grid>
+
+        <Grid item md={12} xs={12} ml={4} mt={3} mr={3}>
+          {formLoading ? (
+            <LoadingTable />
+          ) : form && form?.length > 0 ? (
+            <DataGrid
+              rows={form}
+              columns={columns}
+              className={formCSS.mainGrid}
+              autoHeight
+              autoWidth
+              pagination={false}
+              sx={{
+                margin: 0,
+                "& .MuiDataGrid-root": {
+                  padding: 0,
+                },
+                "& .MuiDataGrid-filler": {
+                  backgroundColor: "#1182C574",
+                },
+              }}
+              getRowId={(e) => e?._id}
+              disableRowSelectionOnClick
+            />
+          ) : (
+            <Box
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              height="100%"
+            >
+              <img
+                src="/img/No data.gif"
+                alt="No data available"
+                height="200"
+              />
+            </Box>
+          )}
+        </Grid>
+
+        <Box className="mt-3 mb-3">
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            sx={{
+              "& .MuiPaginationItem-root": {
+                color: "#0672bc",
+              },
+              "& .MuiPaginationItem-page.Mui-selected": {
+                backgroundColor: "#0672bc",
+                color: "black",
+              },
+              "& .MuiPaginationItem-page:hover": {
+                backgroundColor: "#0672bc",
+                color: "black",
+              },
+            }}
+          />
+        </Box>
       </Grid>
     </>
   );

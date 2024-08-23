@@ -1,51 +1,64 @@
 import companyCSS from "./company.module.scss";
-import { IconButton, Stack, Grid, TextField } from "@mui/material";
+import {
+  IconButton,
+  Stack,
+  Grid,
+  TextField,
+  Box,
+  Pagination,
+  Tooltip,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { getDeletedCompanies, restoreCompanybyid } from "../../apis/companySlice";
+import {
+  getDeletedCompanies,
+  restoreCompanybyid,
+} from "../../apis/companySlice";
 import { getUserName } from "../../common/common";
 import moment from "moment";
 import noPhoto from "../../assets/no_photo.jpg";
-import { toast } from "react-toastify";
-// import RestoreIcon from "../../assets/restore.png";
-import RestorePageIcon from '@mui/icons-material/RestorePage';
+import RestorePageIcon from "@mui/icons-material/RestorePage";
 import { DataGrid } from "@mui/x-data-grid";
+import Swal from "sweetalert2";
+import LoadingTable from "../../common/loadingTable";
 
 const DeletedCompanies = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [data, setData] = useState(0);
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(3);
-  const [count, setCount] = useState(0);
   const dispatch = useDispatch();
-  const { auth } = useSelector((state) => state.authData);
   const { users } = useSelector((state) => state.authData);
-  const { delComp } = useSelector((state) => state.companyData);
+  const { delComp, totalPages, compLoading } = useSelector(
+    (state) => state.companyData
+  );
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Effect Zone ------------------
 
   useEffect(() => {
-    const callApi = async() => {
-      const res = await dispatch(getDeletedCompanies({ page, pageSize, search: searchTerm }));
-      setData(res?.payload?.data);
-      setCount(res?.payload?.totalCount);
-    }
-    callApi();
-  }, [page, pageSize, searchTerm, dispatch]);
+    dispatch(
+      getDeletedCompanies({ page: currentPage, limit: 5, search: searchTerm })
+    );
+  }, [dispatch, currentPage, searchTerm]);
 
-  const handlePaginationModelChange = (model) => {
-    setPage(model.page);
-    setPageSize(model.pageSize);
+  //---For Pagination-----------------
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
   };
+
+  //---For Restore--------------------
 
   const handleRestore = async (id) => {
     const res = await dispatch(restoreCompanybyid(id));
     if (res.type.includes("fulfilled")) {
-      toast.success(res.payload.message);
+      Swal.fire({
+        title: "Success",
+        text: res.payload.message,
+        icon: "success",
+        timer: 2000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
     }
-
-    const recall = await dispatch(getDeletedCompanies({ page, pageSize, search: searchTerm  }))
-    
-    setCount(recall?.payload?.totalCount);
-    setData(recall?.payload?.data);
   };
 
   const searchData = (e) => {
@@ -143,9 +156,15 @@ const DeletedCompanies = () => {
               height={"100%"}
               alignItems={"center"}
             >
-              <IconButton size="small" onClick={() => handleRestore(params.row._id)} className={companyCSS.restoreBtnBG}>
-              <RestorePageIcon  className={companyCSS.restoreBtn}/>
-              </IconButton>
+              <Tooltip title="Restore">
+                <IconButton
+                  size="small"
+                  onClick={() => handleRestore(params.row._id)}
+                  className={companyCSS.restoreBtnBG}
+                >
+                  <RestorePageIcon className={companyCSS.restoreBtn} />
+                </IconButton>
+              </Tooltip>
             </Stack>
           </>
         );
@@ -175,44 +194,61 @@ const DeletedCompanies = () => {
       </Grid>
 
       <Grid item md={12} xs={12} ml={4} mt={3} mr={3}>
-        <DataGrid
-          rows={data || []}
-          columns={columns}
-          className={companyCSS.mainGrid}
-          rowHeight={80}
-          rowCount={count}
-          autoHeight
-          autoWidth
-          sx={{
-            margin: 0,
-            "& .MuiDataGrid-root": {
-              padding: 0,
-            },
-            "& .MuiDataGrid-filler": {
-              backgroundColor: "#1182C574",
-            },
-          }}
-          pagination
-          paginationMode="server"
-          initialState={{
-            ...data.initialState,
-            pagination: {
-              ...data.initialState?.pagination,
-              paginationModel: {
-                pageSize: pageSize,
-                page: page 
+        {compLoading ? (
+          <LoadingTable />
+        ) : delComp && delComp.length > 0 ? (
+          <DataGrid
+            rows={delComp}
+            columns={columns}
+            className={companyCSS.mainGrid}
+            rowHeight={80}
+            autoHeight
+            autoWidth
+            pagination={false}
+            sx={{
+              margin: 0,
+              "& .MuiDataGrid-root": {
+                padding: 0,
               },
+              "& .MuiDataGrid-filler": {
+                backgroundColor: "#1182C574",
+              },
+            }}
+            getRowId={(e) => e?._id}
+            disableRowSelectionOnClick
+          />
+        ) : (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="100%"
+          >
+            <img src="/img/No data.gif" alt="No data available" height="200" />
+          </Box>
+        )}
+      </Grid>
+
+      <Box className="mt-3 mb-3">
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={handlePageChange}
+          sx={{
+            "& .MuiPaginationItem-root": {
+              color: "#0672bc",
+            },
+            "& .MuiPaginationItem-page.Mui-selected": {
+              backgroundColor: "#0672bc",
+              color: "white",
+            },
+            "& .MuiPaginationItem-page:hover": {
+              backgroundColor: "#5ade5d",
+              color: "black",
             },
           }}
-          pageSizeOptions={[pageSize]}
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          onPaginationModelChange={handlePaginationModelChange}
-          rowsPerPageOptions={[3]}
-          getRowId={(e) => e._id}
-          disableRowSelectionOnClick
         />
-      </Grid>
+      </Box>
     </>
   );
 };

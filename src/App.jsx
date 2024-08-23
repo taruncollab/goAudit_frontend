@@ -1,11 +1,4 @@
-import {
-  BrowserRouter,
-  Navigate,
-  redirect,
-  Route,
-  Routes,
-  useNavigate,
-} from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Company from "./pages/company/Company";
 import Layout from "./Layout/Layout";
@@ -22,52 +15,43 @@ import FormDetails from "./pages/form/FormDetails";
 import Dashboard from "./pages/dashboard/Dashboard";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { getCompanies, getDeletedCompanies } from "./apis/companySlice";
 import { getUserByToken, getUsers } from "./apis/authSlice";
-import { getAllCategories } from "./apis/categorySlice";
-import { getQuestions } from "./apis/questionSlice";
-import { getForms } from "./apis/formSlice";
-import { getDeletedLocations, getLocations } from "./apis/locationSlice";
+
 import CompareScore from "./pages/Compare/CompareScore";
-import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Category from "./pages/category/Category";
+import { getDashboardCount } from "./apis/dashboardSlice";
 
 function App() {
   const dispatch = useDispatch();
-  const [expire, setExpire] = useState(false)
+  const [expire, setExpire] = useState(false);
 
   useEffect(() => {
     dispatch(getUsers());
-    // dispatch(getCompanies());
-    // dispatch(getDeletedCompanies());
-    // dispatch(getLocations());
-    // dispatch(getDeletedLocations());
-    dispatch(getAllCategories());
-    // dispatch(getQuestions());
-    // dispatch(getForms());
+    dispatch(getDashboardCount());
 
     const checkToken = async () => {
       const res = await dispatch(getUserByToken());
-      if (res.type.includes("rejected")) {
+      if (res?.type?.includes("rejected")) {
         localStorage.removeItem("userToken");
-        setExpire(true)
+        setExpire(true);
       }
     };
-    
+
     checkToken();
   }, []);
-  
+
   useEffect(() => {
     if (expire) {
       <Navigate to={"/login"} />;
-      
     }
   }, [expire]);
 
   return (
     <>
       <BrowserRouter>
-      <ToastContainer />
+        <ToastContainer />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
@@ -93,6 +77,15 @@ function App() {
             element={
               <Layout>
                 <Location />
+              </Layout>
+            }
+          />
+
+          <Route
+            path="/category"
+            element={
+              <Layout>
+                <Category />
               </Layout>
             }
           />

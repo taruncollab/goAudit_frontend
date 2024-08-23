@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import {
-  Box,
   Button,
   Checkbox,
   FormControl,
@@ -18,8 +17,14 @@ import {
 import { TextareaAutosize } from "@mui/base/TextareaAutosize";
 import formCSS from "./form.module.scss";
 import { addForm } from "../../apis/formSlice";
-import { toast } from "react-toastify";
 import { getQuestions } from "../../apis/questionSlice";
+import Swal from "sweetalert2";
+import {
+  AdsClick as AdsClickIcon,
+  NoteAlt as NoteAltIcon,
+  Assignment as AssignmentIcon,
+} from "@mui/icons-material";
+import { toast } from "react-toastify";
 
 export default function Form() {
   const navigate = useNavigate();
@@ -51,68 +56,46 @@ export default function Form() {
     // score: 0,
   });
 
-  useEffect(() => {
-    const callApi = async() => {
-      const res = await dispatch(getQuestions());
-
-    }
-    callApi();
-  }, []);
+  console.log(values, "values");
 
   useEffect(() => {
     if (id) {
-      const data = question.find((f) => f._id == id);
+      dispatch(getQuestions({}));
 
-      if (data) {
-        const newValues = {
-          ...values,
-          compId: data.compId || "",
-          locId: data.locId || "",
-          categoryId: data.categoryId || "",
-          title: data.title || "",
-          formData: data.questions.map((q) => ({
-            text: q.question || "",
-            type: q.type || "",
-            options: q.options || "",
-            prefAns: q.prefAns || "",
-            answer: [],
-            attachment: "",
-            remark: "",
-          })),
-          // score: 0,
-        };
+      const data = question && question?.find((f) => f?._id == id);
 
-        setValues(newValues);
-      }
+      const newValues = {
+        ...values,
+        compId: data?.compId || "",
+        locId: data?.locId || "",
+        categoryId: data?.categoryId || "",
+        title: data?.title || "",
+        formData: data?.questions?.map((q) => ({
+          text: q?.question || "",
+          type: q?.type || "",
+          options: q?.options || "",
+          prefAns: q?.prefAns || "",
+          answer: [],
+          attachment: "",
+          remark: "",
+        })),
+        // score: 0,
+      };
+
+      setValues(newValues);
     }
   }, [id]);
 
-  // useEffect(() => {
-  //   values.formData.map((v, index) => {
-  //     let updatedValues = { ...values };
-  //     if (v?.type == "yes/no") {
-  //       if (v.answer == v.prefAns) {
-  //         updatedValues= {
-  //           ...updatedValues, score: updatedValues.score + 1
-  //         };
-  //       }
-  //     }
-  //     // return updatedValues
-  //   })
-  // }, [values]);
+  // For Radio Button------------------------
 
   const handleChange = (e, index) => {
-    const { name, value } = e.target;
-    const updatedValues = { ...values };
+    const { value } = e.target;
+    let updatedValues = { ...values };
 
     updatedValues.formData[index] = {
       ...updatedValues.formData[index],
-      answer: value,
+      answer: [value],
     };
-
-    // if (value == updatedValues.formData[index].prefAns) {
-    //   updatedValues.score = updatedValues.score + 1;
-    // }
 
     setValues(updatedValues);
   };
@@ -181,31 +164,60 @@ export default function Form() {
     };
   };
 
+  // Handle Submit===================
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const res = await dispatch(addForm({...values, createdBy: auth._id}));
+    if (values?.formData?.map((f) => f?.answer?.length).includes(0)) {
+      return toast.warning("Please Answer All Questions");
+    }
+
+    const res = await dispatch(addForm({ ...values, createdBy: auth?._id }));
     if (res.type.includes("fulfilled")) {
       navigate("/formrecords");
       setValues({});
-      toast.success(res.payload.message)
+      Swal.fire({
+        title: "Success",
+        text: res.payload.message,
+        icon: "success",
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
     }
   };
 
   return (
     <>
-      <Grid container>
-        <Grid item xs={12} container justifyContent={"space-between"}>
-          <Typography className={formCSS.title}>FILL FORM</Typography>
-          <Typography mr={9} className={formCSS.head}>
-            {values?.title}
+      <Grid className={formCSS.mainBox}>
+        <div
+          className={formCSS.header}
+          style={{
+            width: "100% !important",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography
+            className={formCSS.title}
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <AssignmentIcon style={{ fontSize: "30px" }} /> FILL FORM
           </Typography>
-        </Grid>
 
-        <Grid item md={11} xs={11} mt={1} ml={3} mr={3}>
+          <img
+            src="/img/fillForm.jpg"
+            alt="Fill Form Animation"
+            className={formCSS.questionimage}
+          />
+        </div>
+
+        <Grid item md={11} xs={11} mt={4} ml={3} mr={3}>
           <form noValidate>
             {values &&
-              values.formData.map((data, index) => {
+              values?.formData?.map((data, index) => {
                 const inputName = `formData${[index]}.answer`;
                 const attachmentName = `formData${[index]}.attachment`;
                 const remarkName = `formData${[index]}.remark`;
@@ -219,12 +231,26 @@ export default function Form() {
                     className={formCSS.questionBox}
                   >
                     <Typography pt={2} ml={3}>
+                      <img
+                        src="/src/assets/Question.png"
+                        style={{
+                          width: "25px",
+                          height: "25px",
+                          marginRight: "5px",
+                        }}
+                      />
                       <span className={formCSS.questionText}>{data?.text}</span>
                     </Typography>
-                    <Grid container  alignItems={"center"} justifyContent={"flex-start"} spacing={2} mt={1} ml={1}>
+                    <Grid
+                      container
+                      alignItems={"center"}
+                      justifyContent={"flex-start"}
+                      spacing={2}
+                      mt={1}
+                      ml={1}
+                    >
                       <Grid item xs={12} md={4}>
                         <Button className={formCSS.attachmentBtn}>
-                          {/* attachment photo */}
                           <input
                             type="file"
                             name={attachmentName}
@@ -236,24 +262,27 @@ export default function Form() {
                           />
                         </Button>
                       </Grid>
-                      <Grid item xs={12} md={2} ml={{xs:0, md:3}}>
+                      <Grid item xs={12} md={2} ml={{ xs: 0, md: 3 }}>
                         <Button
                           size="small"
                           className={formCSS.remarkBtn}
                           onClick={() => setOpenRemarkIndex(index)}
                         >
-                          add remarks
+                          <NoteAltIcon sx={{ mr: 1 }} /> add remarks
                         </Button>
                       </Grid>
                     </Grid>
 
+                    {/* Options here------------ */}
+
                     {data?.type === "yes/no" && (
-                      <Grid ml={3} mt={1} mb={1}>
+                      //Radio Button---------------
+                      <Grid ml={3} mt={2} mb={1}>
                         <FormControl component="fieldset">
                           <RadioGroup
                             aria-label="yes/no"
                             name={inputName}
-                            value={values.formData[index].answer}
+                            value={values.formData[index]?.answer[0]}
                             onChange={(e) => handleChange(e, index)}
                           >
                             <Stack direction={"row"} gap={2}>
@@ -274,19 +303,26 @@ export default function Form() {
                     )}
 
                     {data?.type === "descriptive" && (
-                      <Grid ml={3} mr={3} mt={1} mb={1}>
+                      <Grid ml={3} mr={3} mt={2} mb={1}>
                         <TextareaAutosize
                           name={inputName}
                           value={values.formData[index].answer || ""}
-                          minRows={3}
-                          style={{ width: 503 }}
+                          minRows={2}
+                          placeholder="Enter your answer...."
+                          style={{
+                            width: 380,
+                            borderRadius: "20px",
+                            borderColor: "#f77e09",
+                            padding: "10px",
+                            boxSizing: "border-box",
+                          }}
                           onChange={(e) => handleChange(e, index)}
                         />
                       </Grid>
                     )}
 
                     {data?.type === "options" && (
-                      <Grid ml={3} mt={1} mb={1}>
+                      <Grid ml={3} mt={2} mb={1}>
                         <FormControl component="fieldset">
                           <RadioGroup
                             aria-label="options"
@@ -295,7 +331,7 @@ export default function Form() {
                             onChange={(e) => handleChange(e, index)}
                           >
                             <Stack direction={"row"} gap={2}>
-                              {data?.options.map((option, optionIndex) => (
+                              {data?.options?.map((option, optionIndex) => (
                                 <FormControlLabel
                                   key={optionIndex}
                                   value={option}
@@ -314,14 +350,14 @@ export default function Form() {
                         <FormControl component="fieldset">
                           <FormGroup>
                             <Stack direction={"row"} gap={2}>
-                              {data?.options.map((option, optionIndex) => (
+                              {data?.options?.map((option, optionIndex) => (
                                 <FormControlLabel
                                   key={optionIndex}
                                   control={
                                     <Checkbox
                                       checked={values.formData[
                                         index
-                                      ].answer.includes(option)}
+                                      ].answer?.includes(option)}
                                       onChange={(e) => handleCheck(e, index)}
                                       value={option}
                                     />
@@ -363,6 +399,7 @@ export default function Form() {
               <Button className={formCSS.submitBtn} onClick={handleSubmit}>
                 Submit
               </Button>
+
               <Button
                 className={formCSS.cancelBtn}
                 onClick={() => navigate(`/showforms`)}

@@ -1,45 +1,42 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Button, Grid, Stack, Typography } from "@mui/material";
-import {
-  getCategoryName,
-  getCompanyName,
-  getLocationName,
-} from "../../common/common";
+import { Button, Grid, Stack, Tooltip, Typography } from "@mui/material";
 import formCSS from "./form.module.scss";
-import { getAllCompanies } from "../../apis/companySlice";
-import { getAllLocations } from "../../apis/locationSlice";
+import { getForms } from "../../apis/formSlice";
+import {
+  ReplyAll as ReplyAllIcon,
+  AdsClick as AdsClickIcon,
+  FormatShapes as FormatShapesIcon,
+  Style as StyleIcon,
+  Attachment as AttachmentIcon,
+  NoteAlt as NoteAltIcon,
+  Draw as DrawIcon,
+} from "@mui/icons-material";
 
 const FormDetails = () => {
-  const [details, setDetails] = useState(null);
-
+  const { id } = useParams();
   const navigate = useNavigate();
-
-  const { form } = useSelector((state) => state.formData);
-  const { comp } = useSelector((state) => state.companyData);
-  const { location } = useSelector((state) => state.locationData);
-  const { category } = useSelector((state) => state.categoryData);
-
   const dispatch = useDispatch();
 
-  const { id } = useParams();
+  const { form } = useSelector((state) => state.formData);
 
+  // State Zone---------------------
+
+  const [details, setDetails] = useState(null);
+
+  //Effect Zone---------------------
+
+  //Edit-----
   useEffect(() => {
-    const callApi = () => {
-      dispatch(getAllCompanies());
-      dispatch(getAllLocations());
-
+    if (id) {
+      dispatch(getForms({}));
+      const data = form && form?.find((f) => f?._id == id);
+      setDetails(data);
     }
-    callApi();
-  }, []);
-
-  useEffect(() => {
-    const data = form.find((f) => f._id == id);
-    setDetails(data);
-  }, [id]);
+  }, [id, dispatch]);
 
   return (
     <>
@@ -50,19 +47,19 @@ const FormDetails = () => {
           alignItems={"center"}
           mb={2}
         >
-          <Grid container direction={"column"} item md={8} xs={6}>
+          <Grid container direction={"column"} item mt={2} md={8} xs={6}>
             <Grid item mb={1}>
               <Typography className={formCSS.auditTitle}>
-                {details?.title.toUpperCase()}
+                <AdsClickIcon /> {details?.title?.toUpperCase()}
               </Typography>
             </Grid>
-            <Grid container item direction={"row"} mb={1}>
+            <Grid container item direction={"row"} mb={1} mt={2}>
               <Grid item md={2} xs={6}>
                 <Typography className={formCSS.key}>Company</Typography>
               </Grid>
               <Grid item md={6} xs={6}>
                 <Typography className={formCSS.value}>
-                  : {getCompanyName(details?.compId, comp)}
+                  : {details?.compId?.label || "No Company Name"}
                 </Typography>
               </Grid>
             </Grid>
@@ -72,7 +69,7 @@ const FormDetails = () => {
               </Grid>
               <Grid item md={6} xs={6}>
                 <Typography className={formCSS.value}>
-                  : {getLocationName(details?.locId, location)}
+                  : {details?.locId?.label || "No Location Name"}
                 </Typography>
               </Grid>
             </Grid>
@@ -82,7 +79,7 @@ const FormDetails = () => {
               </Grid>
               <Grid item md={6} xs={6}>
                 <Typography className={formCSS.value}>
-                  : {getCategoryName(details?.categoryId, category)}
+                  : {details?.categoryId?.label || "No Category Name"}
                 </Typography>
               </Grid>
             </Grid>
@@ -98,170 +95,140 @@ const FormDetails = () => {
             </Grid>
           </Grid>
           <Stack item gap={2} md={4} xs={6} mr={4}>
-            {/* <Button
-              className={formCSS.edit}
-              onClick={() => navigate(`/questionform/${id}`)}
-            >
-              Edit
-            </Button> */}
             <Button
               className={formCSS.backBtn}
               onClick={() => navigate("/formrecords")}
             >
-              Back
+              <ReplyAllIcon sx={{ mr: 1 }} /> Back
             </Button>
           </Stack>
         </Grid>
         {details &&
           details?.formData?.map((d, i) => {
             return (
-              <Grid mr={4} mb={2} className={formCSS.questionCard}>
-                <Card>
-                  <Grid className={formCSS.questionHead}>
-                    <Typography ml={2} className={formCSS.questionTitleText}>
-                      <span className={formCSS.questionNum}>
-                        Question {i + 1}:
-                      </span>
-                      &nbsp;&nbsp;&nbsp; {d?.question}
-                    </Typography>
-                  </Grid>
-                  <CardContent className={formCSS.cardContent}>
-                    <Grid container direction={"column"}>
-                      <Grid container item>
-                        <Grid item md={2} className={formCSS.questionKey}>
-                          Type
-                        </Grid>
-                        <Grid item md={10}>
-                          :{d?.type}
-                        </Grid>
-                      </Grid>
-                      {d?.options.length !== 0 ? (
-                        <Grid container item>
+              <>
+                <Grid mr={4} mb={2} className={formCSS.questionCard}>
+                  <Card>
+                    <Grid className={formCSS.questionHead}>
+                      <Typography ml={2} className={formCSS.questionTitleText}>
+                        <span className={formCSS.questionNum}>
+                          <img
+                            src="/src/assets/Question.png"
+                            style={{
+                              width: "23px",
+                              height: "23px",
+                              marginRight: "5px",
+                            }}
+                          />
+                          Question {i + 1}:
+                        </span>
+                        &nbsp;&nbsp;&nbsp; {d?.text}
+                      </Typography>
+                    </Grid>
+                    <CardContent className={formCSS.cardContent}>
+                      <Grid container direction={"column"}>
+                        <Grid container item mt={1}>
                           <Grid item md={2} className={formCSS.questionKey}>
-                            Options
+                            <FormatShapesIcon sx={{ mr: 1 }} /> Type :
                           </Grid>
                           <Grid item md={10}>
-                            :
-                            {d?.options.map((o, index) => (
-                              <span key={index}>
-                                <b>{index + 1}.</b> {o} &nbsp;&nbsp;&nbsp;&nbsp;
-                              </span>
-                            ))}
+                            {d?.type}
                           </Grid>
                         </Grid>
-                      ) : (
-                        <></>
-                      )}
-                      <Grid container item>
-                        <Grid item md={2} className={formCSS.questionKey}>
-                          Answer
-                        </Grid>
-                        <Grid item md={10}>
-                          :
-                          {d?.type === "multichoice" ? (
-                            d?.prefAns
-                              .filter((p) => p.trim() !== "") // Filter out blank or whitespace-only strings
-                              .map((p, index) => (
+                        {d?.options?.length !== 0 ? (
+                          <Grid container item mt={2}>
+                            <Grid item md={2} className={formCSS.questionKey}>
+                              <StyleIcon sx={{ mr: 1 }} /> Options :
+                            </Grid>
+                            <Grid item md={10}>
+                              {d?.options?.map((o, index) => (
                                 <span key={index}>
-                                  <b>{index + 1}.</b>{" "}
-                                  <span className={formCSS.prefAns}>{p}</span>
+                                  <b>{index + 1}.</b> {o}{" "}
                                   &nbsp;&nbsp;&nbsp;&nbsp;
                                 </span>
-                              ))
-                          ) : (
-                            <span className={formCSS.prefAns}>{d?.answer}</span>
-                          )}
+                              ))}
+                            </Grid>
+                          </Grid>
+                        ) : (
+                          <></>
+                        )}
+
+                        <Grid container item mt={2}>
+                          <Grid item md={2} className={formCSS.questionKey}>
+                            <DrawIcon sx={{ mr: 1 }} /> Answer :
+                          </Grid>
+                          <Grid item md={10}>
+                            {d?.type === "multichoice" ? (
+                              d?.prefAns
+                                ?.filter((p) => p?.trim() !== "") // Filter out blank or whitespace-only strings
+                                .map((p, index) => (
+                                  <span key={index}>
+                                    <b>{index + 1}.</b>{" "}
+                                    <span className={formCSS.prefAns}>{p}</span>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                  </span>
+                                ))
+                            ) : (
+                              <span className={formCSS.prefAns}>
+                                {d?.answer}
+                              </span>
+                            )}
+                          </Grid>
                         </Grid>
+
+                        {d?.remark?.length > 0 && (
+                          <Grid container item mt={2}>
+                            <Grid item md={2} className={formCSS.questionKey}>
+                              <NoteAltIcon sx={{ mr: 1 }} /> Remarks :
+                            </Grid>
+                            <Grid item md={10}>
+                              {d?.attachment && d?.remark.length > 0 && (
+                                <>
+                                  <span>{d?.remark}</span>
+                                </>
+                              )}
+                            </Grid>
+                          </Grid>
+                        )}
+                        {d?.attachment?.length > 0 && (
+                          <Grid container item mt={2}>
+                            <Grid item md={2} className={formCSS.questionKey}>
+                              <AttachmentIcon sx={{ mr: 1 }} /> Attachment :
+                            </Grid>
+                            <Grid item md={10}>
+                              {d?.attachment ? (
+                                <Tooltip title="Download">
+                                  <a
+                                    href={d?.attachment}
+                                    download
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <img
+                                      src={d?.attachment}
+                                      style={{
+                                        width: "250px",
+                                        height: "200px",
+                                        objectFit: "contain",
+                                      }}
+                                    />
+                                  </a>
+                                </Tooltip>
+                              ) : (
+                                <></>
+                              )}
+                            </Grid>
+                          </Grid>
+                        )}
                       </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
-              </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </>
             );
           })}
       </Grid>
     </>
-    // <>
-    //   <div className="d-flex flex-row justify-content-between">
-    //     <div>
-    //       <h2>{details?.title.toUpperCase()}</h2>
-    //       <h5>Company: &nbsp; {getCompanyName(details?.compId, comp)}</h5>
-    //       <h5>Location: &nbsp;&nbsp;&nbsp;&nbsp; {getLocationName(details?.locId, location)}</h5>
-    //       <h5>Category: &nbsp;&nbsp; {getCategoryName(details?.categoryId, category)}</h5>
-    //       <h5>Score: &nbsp;&nbsp; {details?.score}</h5>
-    //     </div>
-    //     <div>
-    //       <Button variant="contained" onClick={() => navigate(`/formrecords`)}>
-    //         Back
-    //       </Button>
-    //     </div>
-    //   </div>
-    //   <Card sx={{ minWidth: 275 }}>
-    //     {details &&
-    //       details.formData.map((d, i) => {
-    //         return (
-    //           <div
-    //             style={{
-    //               background: '#0000ff24',
-    //               padding: '0'
-    //             }}
-    //           >
-    //             <CardContent style={{ borderTop: '1px solid #878787' }}>
-    //               <div style={{ padding: '0' }}>
-    //                 <Typography variant="h5" component="div" className="mb-2">
-    //                   Que {i + 1}: {d?.text}
-    //                 </Typography>
-    //                 <Typography variant="body2">
-    //                   <span style={{ fontWeight: 'bold' }}>Type: </span>
-    //                   {d?.type}
-    //                 </Typography>
-    //                 <Typography variant="body2">
-    //                   <span style={{ fontWeight: 'bold' }}>Ans: </span>
-    //                   {d?.type == 'multichoice' ? (
-    //                     <>
-    //                       {d.answer.map((e) => {
-    //                         return (
-    //                           <p>
-    //                             {e} <br />
-    //                           </p>
-    //                         );
-    //                       })}
-    //                     </>
-    //                   ) : (
-    //                     <>{d?.answer}</>
-    //                   )}
-    //                 </Typography>
-    //                 {d?.remark ? (
-    //                   <Typography variant="body2">
-    //                     <span style={{ fontWeight: 'bold' }}>Remark: </span>
-    //                     {d?.remark}{' '}
-    //                   </Typography>
-    //                 ) : (
-    //                   <></>
-    //                 )}
-    //                 {d?.attachment ? (
-    //                   <div className="d-flex flex-column align-item-start">
-    //                     <span style={{ fontWeight: 'bold' }}>Attachment: </span>
-    //                     <img src={d?.attachment} alt="attachment image" style={{
-    //                       width: '10rem'
-    //                     }} />
-    //                   </div>
-    //                 ) : (
-    //                   <></>
-    //                 )}
-    //                 {/* <hr /> */}
-    //               </div>
-    //             </CardContent>
-    //           </div>
-    //         );
-    //       })}
-    //   </Card>
-    //   <div className="d-flex justify-content-end mt-3">
-    //     {/* <Button variant="contained" onClick={() => navigate('/formrecords')}>
-    //       Back
-    //     </Button> */}
-    //   </div>
-    // </>
   );
 };
 

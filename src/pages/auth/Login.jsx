@@ -61,6 +61,8 @@ const Login = () => {
     }));
   };
 
+  //Handle Submit-------------
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -68,9 +70,9 @@ const Login = () => {
 
     if (res.type.includes("fulfilled")) {
       navigate("/");
-      toast.success(res.payload.response.data.message);
+      toast.success(res.payload.response?.data?.message);
     } else {
-      toast.warning(res.payload.response.data.message);
+      toast.warning(res.payload.response?.data?.message);
     }
   };
 
@@ -101,7 +103,6 @@ const Login = () => {
                     <InputLabel>Email Address</InputLabel>
                     <TextField
                       fullWidth
-                      // label="Email Address"
                       margin="normal"
                       name="email"
                       className={style.input}
@@ -113,7 +114,7 @@ const Login = () => {
                       InputProps={{
                         disableUnderline: true,
                         sx: {
-                          marginTop: "-15px",
+                          marginTop: "-10px",
                           backgroundColor: "#E2DFDF",
                           border: "none",
                           "& .MuiOutlinedInput-notchedOutline": {
@@ -215,7 +216,7 @@ const Login = () => {
                     type="submit"
                     className={style.submit}
                     variant="contained"
-                    sx={{ textTransform: "none", mt: 2 }}
+                    // sx={{ textTransform: "none", mt: 2 }}
                     onClick={isOtp ? handleSubmit : handleOtp}
                   >
                     {!isOtp ? "Get OTP" : "Log In"}
@@ -224,7 +225,7 @@ const Login = () => {
                   {!isOtp ? (
                     <Grid container justifyContent="center" className="mt-3">
                       <p className={style.note}>
-                        Don't have an Account?{" "}
+                        Don't have an Account?
                         <Link to={"/signup"} className={style.link}>
                           Signup
                         </Link>

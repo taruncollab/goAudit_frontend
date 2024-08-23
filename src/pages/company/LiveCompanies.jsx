@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { IconButton, Grid, Stack, TextField } from "@mui/material";
+import {
+  IconButton,
+  Grid,
+  Stack,
+  TextField,
+  Box,
+  Pagination,
+} from "@mui/material";
 import companyCSS from "./company.module.scss";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,40 +18,33 @@ import {
   updateCompanybyid,
 } from "../../apis/companySlice";
 import noPhoto from "../../assets/no_photo.jpg";
-import { toast } from "react-toastify";
-// import DeleteIcon from "../../assets/delete.png";
-// import EditIcon from "../../assets/edit.png";
 import { DataGrid, GridDeleteIcon } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
+import Swal from "sweetalert2";
+import LoadingTable from "../../common/loadingTable";
+import useHandleDelete from "../../common/DeleteFunction";
 
 const LiveCompanies = () => {
   const [upload, setUpload] = useState(null);
   const [base64, setBase64] = useState(null);
   const [formDrawer, setFormDrawer] = useState([false, null]);
-  // const [filterred, setFiltered] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [data, setData] = useState(0);
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(3);
-  const [count, setCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const dispatch = useDispatch();
-  const { comp } = useSelector((state) => state.companyData);
+  const { comp, totalPages, compLoading } = useSelector(
+    (state) => state.companyData
+  );
   const { auth } = useSelector((state) => state.authData);
 
   useEffect(() => {
-    const callApi = async() => {
-      const res = await dispatch(getCompanies({ page, pageSize, search: searchTerm }));
+    dispatch(getCompanies({ page: currentPage, limit: 5, search: searchTerm }));
+  }, [dispatch, currentPage, searchTerm]);
 
-      setData(res?.payload?.data);
-      setCount(res?.payload?.totalCount);
-    }
-    callApi();
-  }, [page, pageSize, searchTerm, dispatch]);
+  //---For Pagination-----
 
-  const handlePaginationModelChange = (model) => {
-    setPage(model.page);
-    setPageSize(model.pageSize);
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
   };
 
   const handleSelectedFile = (event) => {
@@ -66,15 +66,26 @@ const LiveCompanies = () => {
     };
   };
 
+  // Submit Function----------------
   const submitFun = async (values) => {
     if (formDrawer[1] !== null) {
+      //Edit----------------------
+
       const res = await dispatch(updateCompanybyid(values));
 
       if (res.type.includes("fulfilled")) {
         setFormDrawer([false, null]);
-        toast.success("Company Data updated successfully");
+        Swal.fire({
+          title: "Successfully Updated",
+          text: res.payload.message,
+          icon: "success",
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
       }
     } else {
+      //Add----------------------
       const res = await dispatch(
         addCompany({ ...values, createdBy: auth._id, compLogo: base64 })
       );
@@ -82,7 +93,14 @@ const LiveCompanies = () => {
         setFormDrawer([false, null]);
         setUpload(null);
         setBase64(null);
-        toast.success("Company added successfully");
+        Swal.fire({
+          title: "Successfully Updated",
+          text: res.payload.message,
+          icon: "success",
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
       }
     }
   };
@@ -98,35 +116,14 @@ const LiveCompanies = () => {
     setFormDrawer([false, null]);
   };
 
-  const handleDelete = async (id) => {
+  //Handle Delete===================
 
-    swal({
-      title: "Are you sure?",
-      text: "Do you want to Delete this file!!?",
-      icon: "warning",
-      buttons: true,
-      dangerMode: true,
-    })
-    .then(async(willDelete) => {
-      if (willDelete) {
-        const res = await dispatch(deleteCompanybyid({ id: id, dId: auth._id }));
-    if (res.type.includes("fulfilled")) {
-      toast.warning(res.payload.message);
-    }
-    
-    const recall = await dispatch(getCompanies({ page, pageSize, search: searchTerm }))
-    
-    setCount(recall?.payload?.totalCount);
-    setData(recall?.payload?.data);
-      } else {
-        swal("Cancelled!");
-      }
-    });
-  };
+  const handleDelete = useHandleDelete(deleteCompanybyid, "Company");
 
+  //Edit Function====================
   const handleEdit = async (id) => {
     const data = comp?.find((e) => e._id == id);
-
+    setUpload(data?.compLogo);
     setFormDrawer([true, data]);
   };
 
@@ -175,13 +172,11 @@ const LiveCompanies = () => {
       renderCell: (params) => {
         return (
           <>
-            {/* <div className={companyCSS.compLogoBG}> */}
-              <img
-                src={params.row.compLogo || noPhoto}
-                alt="Company Logo"
-                className={companyCSS.compLogo}
-              />
-            {/* </div> */}
+            <img
+              src={params.row.compLogo || noPhoto}
+              alt="Company Logo"
+              className={companyCSS.compLogo}
+            />
           </>
         );
       },
@@ -238,33 +233,21 @@ const LiveCompanies = () => {
             >
               <IconButton
                 size="small"
-                onClick={() => handleEdit(params.row._id)}
+                onClick={() => handleEdit(params?.row?._id)}
                 className={companyCSS.editBtnBG}
               >
                 <EditIcon className={companyCSS.editBtn} />
               </IconButton>
               <IconButton
                 size="small"
-                onClick={() => handleDelete(params.row._id)}
+                onClick={() => {
+                  handleDelete({ id: params?.row?._id, dId: auth?._id });
+                }}
                 className={companyCSS.deleteBtnBG}
               >
                 <GridDeleteIcon className={companyCSS.deleteBtn} />
               </IconButton>
             </Stack>
-            {/* <Stack
-              gap={2}
-              direction={"row"}
-              justifyContent={"center"}
-              height={"100%"}
-              alignItems={"center"}
-            >
-              <IconButton onClick={() => handleEdit(params.row._id)}>
-                <img src={EditIcon} alt="" className={companyCSS.icons} />
-              </IconButton>
-              <IconButton onClick={() => handleDelete(params.row._id)}>
-                <img src={DeleteIcon} alt="" className={companyCSS.icons} />
-              </IconButton>
-            </Stack> */}
           </>
         );
       },
@@ -293,57 +276,62 @@ const LiveCompanies = () => {
       </Grid>
 
       <Grid item md={12} xs={12} ml={4} mt={3} mr={3}>
-        <DataGrid
-          rows={data || []}
-          columns={columns}
-          className={companyCSS.mainGrid}
-          rowCount={count}
-          rowHeight={80}
-          autoHeight
-          autoWidth
-          slots={
-            {
-              // pagination: null,
-            }
-          }
-          sx={{
-            margin: 0,
-            "& .MuiDataGrid-root": {
-              padding: 0,
-            },
-            "& .MuiDataGrid-filler": {
-              backgroundColor: "#1182C574",
-            },
-          }}
-          pagination
-          paginationMode="server"
-          initialState={{
-            ...data.initialState,
-            pagination: {
-              ...data.initialState?.pagination,
-              paginationModel: {
-                pageSize: pageSize,
-                page: page 
+        {compLoading ? (
+          <LoadingTable />
+        ) : comp && comp?.length > 0 ? (
+          <DataGrid
+            rows={comp}
+            columns={columns}
+            className={companyCSS.mainGrid}
+            rowHeight={80}
+            autoHeight
+            autoWidth
+            pagination={false}
+            sx={{
+              margin: 0,
+              "& .MuiDataGrid-root": {
+                padding: 0,
               },
+              "& .MuiDataGrid-filler": {
+                backgroundColor: "#1182C574",
+              },
+            }}
+            getRowId={(e) => e?._id}
+            disableRowSelectionOnClick
+          />
+        ) : (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            height="100%"
+          >
+            <img src="/img/No data.gif" alt="No data available" height="200" />
+          </Box>
+        )}
+      </Grid>
+
+      <Box className="mt-3 mb-3">
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={handlePageChange}
+          sx={{
+            "& .MuiPaginationItem-root": {
+              color: "#0672bc",
+            },
+            "& .MuiPaginationItem-page.Mui-selected": {
+              backgroundColor: "#0672bc",
+              color: "white",
+            },
+            "& .MuiPaginationItem-page:hover": {
+              backgroundColor: "#5ade5d",
+              color: "black",
             },
           }}
-          // initialState={{
-          //   pagination: {
-          //     paginationModel: {
-          //       pageSize: filterred?.length > 0 ? filterred.length : 10,
-          //       page:page
-          //     },
-          //   },
-          // }}
-          pageSizeOptions={[pageSize]}
-          onPageChange={(newPage) => setPage(newPage)}
-          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-          onPaginationModelChange={handlePaginationModelChange}
-          rowsPerPageOptions={[3]}
-          getRowId={(e) => e._id}
-          disableRowSelectionOnClick
         />
-      </Grid>
+      </Box>
+
       <FormDrawer
         anchor="right"
         title="ADD COMPANY"

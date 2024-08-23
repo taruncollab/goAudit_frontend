@@ -21,12 +21,15 @@ export const addCategory = createAsyncThunk(
   }
 );
 
-export const getAllCategories = createAsyncThunk(
-  "getAllCategories",
-  async (data, { rejectWithValue }) => {
+export const getCategories = createAsyncThunk(
+  "getCategories",
+  async ({ page = 1, limit = 5, search = "" }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_PATH}/category/getallcategories`,data,
+      const response = await axios.post(
+        `${
+          import.meta.env.VITE_BACKEND_PATH
+        }/category/getcategories?page=${page}&limit=${limit}`,
+        { search },
         apiHeader
       );
       return response.data;
@@ -36,14 +39,14 @@ export const getAllCategories = createAsyncThunk(
   }
 );
 
-
-
 export const deleteCategorybyid = createAsyncThunk(
   "deleteCategorybyid",
   async (data, { rejectWithValue }) => {
     try {
       const response = await axios.put(
-        `${import.meta.env.VITE_BACKEND_PATH}/category/deletecategorybyid/${data}`,
+        `${import.meta.env.VITE_BACKEND_PATH}/category/deletecategorybyid/${
+          data?.id
+        }`,
         apiHeader
       );
       return response.data;
@@ -59,7 +62,7 @@ export const updateCategorybyid = createAsyncThunk(
     try {
       const response = await axios.put(
         `${import.meta.env.VITE_BACKEND_PATH}/category/updatecategorybyid/${
-          data?.id
+          data?._id
         }`,
         data,
         apiHeader
@@ -71,10 +74,46 @@ export const updateCategorybyid = createAsyncThunk(
   }
 );
 
+export const getDeletedCategories = createAsyncThunk(
+  "getDeletedCategories",
+  async ({ page = 1, limit = 5, search = "" }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${
+          import.meta.env.VITE_BACKEND_PATH
+        }/category/getdeletedcategories?page=${page}&limit=${limit}`,
+        { search },
+        apiHeader
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response);
+    }
+  }
+);
+
+export const restoreCategorybyid = createAsyncThunk(
+  "restoreCategorybyid",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axios.put(
+        `${
+          import.meta.env.VITE_BACKEND_PATH
+        }/category/restorecategorybyid/${data}`,
+        apiHeader
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const categorySliceDetails = createSlice({
   name: "categorySliceDetails",
   initialState: {
     category: [],
+    delCategory: [],
     loading: false,
     error: null,
   },
@@ -95,15 +134,36 @@ export const categorySliceDetails = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(getAllCategories.pending, (state) => {
+      //----------------For getCategories-------------------\\
+
+      .addCase(getCategories.pending, (state) => {
         state.loading = true;
       })
-      .addCase(getAllCategories.fulfilled, (state, action) => {
+      .addCase(getCategories.fulfilled, (state, action) => {
         state.loading = false;
         state.category = action.payload.data;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
         state.error = null;
       })
-      .addCase(getAllCategories.rejected, (state, action) => {
+      .addCase(getCategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      //----------------For get Deletd Categories-------------------\\
+
+      .addCase(getDeletedCategories.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getDeletedCategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.delCategory = action.payload.data;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
+        state.error = null;
+      })
+      .addCase(getDeletedCategories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -116,9 +176,8 @@ export const categorySliceDetails = createSlice({
 
         const { _id } = action.payload.data;
         if (_id) {
-          state.category = state.category.filter(
-            (ele) => ele._id !== _id
-          );
+          state.category = state.category.filter((ele) => ele._id !== _id);
+          state?.delCategory?.unshift(action.payload.data);
         }
       })
       .addCase(deleteCategorybyid.rejected, (state, action) => {
@@ -140,6 +199,22 @@ export const categorySliceDetails = createSlice({
         state.loading = false;
         state.error = action.payload.message;
       })
+
+      .addCase(restoreCategorybyid.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(restoreCategorybyid.fulfilled, (state, action) => {
+        state.loading = false;
+        const { _id } = action.payload.data;
+        if (_id) {
+          state.delCategory = state.delCategory.filter((f) => f._id !== _id);
+          state?.category?.unshift(action.payload.data);
+        }
+      })
+      .addCase(restoreCategorybyid.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
