@@ -29,7 +29,6 @@ const Dashboard = () => {
     questionTempleteCount,
     formCount,
   } = useSelector((state) => state.dashboardData);
-  console.log(userCount);
 
   const cards = [
     { title: "Users", count: userCount, img: userBlack, path: "/" },
