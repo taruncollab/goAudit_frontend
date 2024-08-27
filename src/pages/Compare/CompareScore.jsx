@@ -14,16 +14,6 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Checkbox from "@mui/material/Checkbox";
-import {
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  BarChart,
-  Bar,
-  Rectangle,
-} from "recharts";
 import { getFormbyLocId } from "../../apis/formSlice";
 import compareCSS from "./compare.module.scss";
 import moment from "moment";
@@ -35,7 +25,7 @@ import { toast } from "react-toastify";
 import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import { eslintUseValue } from "@mui/x-data-grid/internals";
+import scoreImage from "/img/Score.jpg";
 import Swal from "sweetalert2";
 import Chart from "./Chart";
 
@@ -331,7 +321,7 @@ const CompareScore = () => {
                         component="img"
                         alt="Card image"
                         height="140"
-                        image="/public/img/Score.jpg"
+                        image={scoreImage}
                         sx={{
                           borderTopLeftRadius: "15px",
                           borderTopRightRadius: "15px",
