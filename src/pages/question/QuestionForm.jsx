@@ -33,6 +33,7 @@ import { getLocationbyCompid } from "../../apis/locationSlice";
 import { debounce } from "lodash";
 import { getCategories } from "../../apis/categorySlice";
 import Swal from "sweetalert2";
+import QuesImage from "../../assets/Question.png";
 
 export default function QuestionForm() {
   const types = ["yes/no", "descriptive", "options", "multichoice"];
@@ -416,7 +417,7 @@ export default function QuestionForm() {
             <Typography className={questionCSS.title}>
               {" "}
               <img
-                src="/src/assets/Question.png"
+                src={QuesImage}
                 alt="image"
                 loading="lazy"
                 style={{ width: "28px", height: "28px", marginRight: "5px" }}
@@ -857,7 +858,7 @@ export default function QuestionForm() {
                   onClick={handleAddQuestion}
                   className={questionCSS.add}
                 >
-                  <ControlPointIcon /> Add Question
+                  <ControlPointIcon sx={{ mr: 1 }} /> Add Question
                 </Button>
               </Grid>
 
