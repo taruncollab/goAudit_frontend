@@ -220,7 +220,7 @@ const Login = () => {
                         className={style.submit}
                         variant="contained"
                       >
-                        {!isOtp ? "Sendig OTP..." : "Verifying OTP..."}
+                        {!isOtp ? "Sending OTP..." : "Verifying OTP..."}
                       </Button>
                     </>
                   ) : (
