@@ -417,7 +417,7 @@ export default function QuestionForm() {
               {" "}
               <img
                 src="/src/assets/Question.png"
-                alt="/src/assets/Question.png"
+                alt="image"
                 loading="lazy"
                 style={{ width: "28px", height: "28px", marginRight: "5px" }}
               />
@@ -426,7 +426,7 @@ export default function QuestionForm() {
 
             <img
               src="/img/addQuestion.gif"
-              alt="/img/addQuestion.gif"
+              alt="image"
               loading="lazy"
               className={questionCSS.questionimage}
             />
