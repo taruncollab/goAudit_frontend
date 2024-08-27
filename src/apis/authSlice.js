@@ -43,7 +43,7 @@ export const logIn = createAsyncThunk(
         data,
         apiHeader
       );
-      if (res.data.token) {
+      if (res?.data?.token) {
         localStorage.setItem("userToken", res.data?.token);
       }
 

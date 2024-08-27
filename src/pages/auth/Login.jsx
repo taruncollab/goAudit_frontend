@@ -12,7 +12,7 @@ import {
   Checkbox,
   InputLabel,
 } from "@mui/material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { getOtp, logIn } from "../../apis/authSlice";
 import style from "./login.module.scss";
@@ -32,6 +32,8 @@ const Login = () => {
   const [otp, setOtp] = useState("");
   const [isOtp, setIsOtp] = useState(false);
 
+  const { authLoading } = useSelector((state) => state.authData);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -40,11 +42,11 @@ const Login = () => {
     // setIsOtp(true);
 
     const res = await dispatch(getOtp({ email: data.email }));
-    if (res.type.includes("fulfilled")) {
+    if (res?.type?.includes("fulfilled")) {
       toast.success("OTP sent successfully ");
       setIsOtp(true);
     } else {
-      toast.warning(res.payload.response.data.message);
+      toast.warning(res?.payload?.response?.data?.message);
     }
   };
 
@@ -209,18 +211,33 @@ const Login = () => {
                     <></>
                   )}
 
-                  <Button
-                    color="primary"
-                    fullWidth
-                    size="large"
-                    type="submit"
-                    className={style.submit}
-                    variant="contained"
-                    // sx={{ textTransform: "none", mt: 2 }}
-                    onClick={isOtp ? handleSubmit : handleOtp}
-                  >
-                    {!isOtp ? "Get OTP" : "Log In"}
-                  </Button>
+                  {authLoading ? (
+                    <>
+                      <Button
+                        color="primary"
+                        fullWidth
+                        size="large"
+                        className={style.submit}
+                        variant="contained"
+                      >
+                        {!isOtp ? "Sendig OTP..." : "Verifying OTP..."}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        color="primary"
+                        fullWidth
+                        size="large"
+                        type="submit"
+                        className={style.submit}
+                        variant="contained"
+                        onClick={isOtp ? handleSubmit : handleOtp}
+                      >
+                        {!isOtp ? "Get OTP" : "Log In"}
+                      </Button>
+                    </>
+                  )}
 
                   {!isOtp ? (
                     <Grid container justifyContent="center" className="mt-3">
