@@ -23,6 +23,9 @@ import {
 const Company = () => {
   const dispatch = useDispatch();
   const { auth } = useSelector((state) => state.authData);
+  const { comp, totalPages, compLoading } = useSelector(
+    (state) => state.companyData
+  );
 
   //State Zone--------------------------
   const [showLive, setShowLive] = useState(true);
@@ -181,6 +184,8 @@ const Company = () => {
         setOpen={setFormDrawer}
         resetFormData={resetFormData}
         closeForm={closeForm}
+        loading={compLoading}
+
       />
     </>
   );

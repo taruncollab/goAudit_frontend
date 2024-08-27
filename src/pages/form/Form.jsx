@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router";
 import {
   Button,
   Checkbox,
+  CircularProgress,
   FormControl,
   FormControlLabel,
   FormGroup,
@@ -20,7 +21,6 @@ import { addForm } from "../../apis/formSlice";
 import { getQuestions } from "../../apis/questionSlice";
 import Swal from "sweetalert2";
 import {
-  AdsClick as AdsClickIcon,
   NoteAlt as NoteAltIcon,
   Assignment as AssignmentIcon,
 } from "@mui/icons-material";
@@ -29,13 +29,14 @@ import { toast } from "react-toastify";
 export default function Form() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { auth } = useSelector((state) => state.authData);
-  const { question } = useSelector((state) => state.questionData);
-
   const { id } = useParams();
 
+  const { auth } = useSelector((state) => state.authData);
+  const { question } = useSelector((state) => state.questionData);
+  const { formLoading } = useSelector((state) => state.formData);
+
+  // State Zone---------------------
   const [openRemarkIndex, setOpenRemarkIndex] = useState(null);
-  const [upload, setUpload] = useState(null);
   const [values, setValues] = useState({
     compId: "",
     locId: "",
@@ -56,7 +57,7 @@ export default function Form() {
     // score: 0,
   });
 
-  console.log(values, "values");
+  //Effect Zone---------------------
 
   useEffect(() => {
     if (id) {
@@ -146,8 +147,6 @@ export default function Form() {
     reader.readAsDataURL(file);
     reader.onload = () => {
       const base64String = reader.result;
-
-      setUpload(file.name);
 
       const updatedValues = { ...values };
 
@@ -396,9 +395,19 @@ export default function Form() {
               mt={3}
               mb={2}
             >
-              <Button className={formCSS.submitBtn} onClick={handleSubmit}>
-                Submit
-              </Button>
+              {formLoading && formLoading ? (
+                <>
+                  <Button className={formCSS.submitBtn}>
+                    <CircularProgress /> Submitting...
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button className={formCSS.submitBtn} onClick={handleSubmit}>
+                    Submit
+                  </Button>
+                </>
+              )}
 
               <Button
                 className={formCSS.cancelBtn}

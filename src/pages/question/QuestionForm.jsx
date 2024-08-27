@@ -13,6 +13,7 @@ import {
   Typography,
   Autocomplete,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
@@ -28,7 +29,7 @@ import { addQuestion, updateQuestionbyid } from "../../apis/questionSlice";
 import questionCSS from "./question.module.scss";
 import { toast } from "react-toastify";
 import { getCompanies } from "../../apis/companySlice";
-import { getLocationbyCompid, getLocations } from "../../apis/locationSlice";
+import { getLocationbyCompid } from "../../apis/locationSlice";
 import { debounce } from "lodash";
 import { getCategories } from "../../apis/categorySlice";
 import Swal from "sweetalert2";
@@ -40,7 +41,9 @@ export default function QuestionForm() {
   const dispatch = useDispatch();
   const { auth } = useSelector((state) => state.authData);
 
-  const { question } = useSelector((state) => state.questionData);
+  const { question, questionLoading } = useSelector(
+    (state) => state.questionData
+  );
 
   const { id } = useParams();
 
@@ -414,6 +417,8 @@ export default function QuestionForm() {
               {" "}
               <img
                 src="/src/assets/Question.png"
+                alt="/src/assets/Question.png"
+                loading="lazy"
                 style={{ width: "28px", height: "28px", marginRight: "5px" }}
               />
               {id ? "EDIT" : "ADD"} QUESTION
@@ -421,6 +426,8 @@ export default function QuestionForm() {
 
             <img
               src="/img/addQuestion.gif"
+              alt="/img/addQuestion.gif"
+              loading="lazy"
               className={questionCSS.questionimage}
             />
           </div>
@@ -877,15 +884,31 @@ export default function QuestionForm() {
                 >
                   Cancel
                 </Button>
-                <Button
-                  disableElevation
-                  size="small"
-                  type="submit"
-                  variant="contained"
-                  className={questionCSS.submit}
-                >
-                  {id ? "Edit" : "Add"}
-                </Button>
+
+                {questionLoading && questionLoading ? (
+                  <>
+                    <Button
+                      fullWidth
+                      disableElevation
+                      className={questionCSS.submit}
+                      // sx={{ textTransform: "none" }}
+                    >
+                      <CircularProgress /> Submitting...
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      disableElevation
+                      size="small"
+                      type="submit"
+                      variant="contained"
+                      className={questionCSS.submit}
+                    >
+                      {id ? "Edit" : "Add"}
+                    </Button>
+                  </>
+                )}
               </Grid>
             </Grid>
           </form>

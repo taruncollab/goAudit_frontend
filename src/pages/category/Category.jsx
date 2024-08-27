@@ -24,6 +24,7 @@ const Category = () => {
 
   const dispatch = useDispatch();
   const { auth } = useSelector((state) => state.authData);
+  const { loading } = useSelector((state) => state.categoryData);
 
   //Search-------------------------------------
 
@@ -138,6 +139,7 @@ const Category = () => {
         setInputValue={setInputValue}
         inputValue={inputValue}
         handleInputChange={handleInputChange}
+        loading={loading}
       />
     </>
   );

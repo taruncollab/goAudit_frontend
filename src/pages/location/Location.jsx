@@ -31,6 +31,7 @@ const Location = () => {
 
   const dispatch = useDispatch();
   const { auth } = useSelector((state) => state.authData);
+  const { locationLoading } = useSelector((state) => state.locationData);
 
   //Search-------------------------------------
 
@@ -237,6 +238,7 @@ const Location = () => {
         handleInputChange={handleInputChange}
         setSelectedValue={setSelectedValue}
         selectedValue={selectedValue}
+        loading={locationLoading}
       />
     </>
   );

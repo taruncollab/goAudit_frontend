@@ -3,6 +3,7 @@ import Drawer from "@mui/material/Drawer";
 import Button from "@mui/material/Button";
 import {
   Autocomplete,
+  CircularProgress,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -39,6 +40,7 @@ export default function FormDrawer(props) {
     handleInputChange,
     setSelectedValue,
     selectedValue,
+    loading,
   } = props;
 
   const handleImageRemove = () => {
@@ -297,16 +299,32 @@ export default function FormDrawer(props) {
                 >
                   Clear
                 </Button>
-                <Button
-                  fullWidth
-                  disableElevation
-                  disabled={isSubmitting}
-                  type="submit"
-                  className={drawerStyle.submitBtn}
-                  sx={{ textTransform: "none" }}
-                >
-                  Submit
-                </Button>
+
+                {loading && loading ? (
+                  <>
+                    <Button
+                      fullWidth
+                      disableElevation
+                      className={drawerStyle.submitBtn}
+                      sx={{ textTransform: "none" }}
+                    >
+                      <CircularProgress /> Submitting...
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      fullWidth
+                      disableElevation
+                      disabled={isSubmitting}
+                      type="submit"
+                      className={drawerStyle.submitBtn}
+                      sx={{ textTransform: "none" }}
+                    >
+                      Submit
+                    </Button>
+                  </>
+                )}
               </Box>
             </form>
           )}
