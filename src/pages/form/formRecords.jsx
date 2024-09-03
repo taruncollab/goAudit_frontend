@@ -80,7 +80,7 @@ const FormRecords = () => {
       headerName: <b>TITLE</b>,
       headerAlign: "center",
       headerClassName: formCSS.headers,
-      align: "left",
+      align: "center",
       disableColumnMenu: true,
       sortable: false,
       width: 200,
@@ -90,14 +90,14 @@ const FormRecords = () => {
       headerName: <b>CATEGORY</b>,
       headerAlign: "center",
       headerClassName: formCSS.headers,
-      align: "left",
+      align: "center",
       disableColumnMenu: true,
       sortable: false,
       width: 200,
       renderCell: (params) => {
         return (
           <Chip
-            label={params?.row?.categoryId?.label || "No Category Name"}
+            label={params?.row?.categoryId?.name || "No Category Name"}
             variant="outlined"
             sx={{ borderColor: "#0672BC", color: "#0672BC" }}
             icon={<CategoryIcon />}
@@ -120,12 +120,12 @@ const FormRecords = () => {
       headerClassName: formCSS.headers,
       disableColumnMenu: true,
       sortable: false,
-      align: "left",
+      align: "center",
       width: 270,
       renderCell: (params) => {
         return (
           <Chip
-            label={params?.row?.compId?.label || "No Company Name"}
+            label={params?.row?.compId?.name || "No Company Name"}
             variant="outlined"
             sx={{ borderColor: "#0672BC", color: "#0672BC" }}
             icon={<CorporateFareIcon />}
@@ -138,14 +138,14 @@ const FormRecords = () => {
       headerName: <b>LOCATION </b>,
       headerAlign: "center",
       headerClassName: formCSS.headers,
-      align: "left",
+      align: "center",
       disableColumnMenu: true,
       sortable: false,
       width: 200,
       renderCell: (params) => {
         return (
           <Chip
-            label={params?.row?.locId?.label || "No Location"}
+            label={params?.row?.locId?.locName || "No Location"}
             variant="outlined"
             sx={{ borderColor: "#0672BC", color: "#0672BC" }}
             icon={<LocationOnIcon />}

@@ -133,6 +133,17 @@ textarea::placeholder {
   color: #21a110;
 }
 // ================================================================================================
+.mainTitle {
+  font-weight: 500 !important;
+  font-size: 1.6rem !important;
+  color: #055975 !important;
+}
+
+.ScoreTitle {
+  font-weight: 600 !important;
+  font-size: 1.6rem !important;
+  color: #069930 !important;
+}
 
 .auditTitle {
   font-weight: 500 !important;
@@ -145,10 +156,21 @@ textarea::placeholder {
   font-size: 16px !important;
   font-weight: 500 !important;
 }
-
 .value {
   font-size: 16px !important;
 }
+
+
+.key1 {
+  color: #055975;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+}
+.value1 {
+  font-size: 15px !important;
+  margin-top: 3px !important;
+}
+
 
 .edit {
   background-color: #1b6191 !important;

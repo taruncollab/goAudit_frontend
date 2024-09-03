@@ -47,12 +47,36 @@ const FormDetails = () => {
           alignItems={"center"}
           mb={2}
         >
-          <Grid container direction={"column"} item mt={2} md={8} xs={6}>
-            <Grid item mb={1}>
+          <Grid container direction={"column"} item mt={2} md={11} xs={6}>
+            <Grid
+              item
+              mb={1}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography className={formCSS.mainTitle}>
+                {"Form Details".toUpperCase()}
+              </Typography>
+
+              <Typography>
+                <Button
+                  className={formCSS.backBtn}
+                  onClick={() => navigate("/formrecords")}
+                >
+                  <ReplyAllIcon sx={{ mr: 1 }} /> Back
+                </Button>
+              </Typography>
+            </Grid>
+
+            <Grid item mb={1} mt={2}>
               <Typography className={formCSS.auditTitle}>
                 <AdsClickIcon /> {details?.title?.toUpperCase()}
               </Typography>
             </Grid>
+
             <Grid container item direction={"row"} mb={1} mt={2}>
               <Grid item md={2} xs={6}>
                 <Typography className={formCSS.key}>Company</Typography>
@@ -69,7 +93,7 @@ const FormDetails = () => {
               </Grid>
               <Grid item md={6} xs={6}>
                 <Typography className={formCSS.value}>
-                  : {details?.locId?.label || "No Location Name"}
+                  : {details?.locId[0]?.label || "No Location Name"}
                 </Typography>
               </Grid>
             </Grid>
@@ -83,25 +107,18 @@ const FormDetails = () => {
                 </Typography>
               </Grid>
             </Grid>
+
             <Grid container item direction={"row"} mb={1}>
               <Grid item md={2} xs={6}>
                 <Typography className={formCSS.key}>Score</Typography>
               </Grid>
               <Grid item md={6} xs={6}>
-                <Typography className={formCSS.value}>
-                  : {details?.score}
+                <Typography className={formCSS.ScoreTitle}>
+                  : {details?.score || "No Data"}
                 </Typography>
               </Grid>
             </Grid>
           </Grid>
-          <Stack item gap={2} md={4} xs={6} mr={4}>
-            <Button
-              className={formCSS.backBtn}
-              onClick={() => navigate("/formrecords")}
-            >
-              <ReplyAllIcon sx={{ mr: 1 }} /> Back
-            </Button>
-          </Stack>
         </Grid>
         {details &&
           details?.formData?.map((d, i) => {
@@ -143,7 +160,7 @@ const FormDetails = () => {
                             <Grid item md={10}>
                               {d?.options?.map((o, index) => (
                                 <span key={index}>
-                                  <b>{index + 1}.</b> {o}{" "}
+                                  <b>{index + 1}.</b> {o}
                                   &nbsp;&nbsp;&nbsp;&nbsp;
                                 </span>
                               ))}
@@ -164,7 +181,9 @@ const FormDetails = () => {
                                 .map((p, index) => (
                                   <span key={index}>
                                     <b>{index + 1}.</b>{" "}
-                                    <span className={formCSS.prefAns}>{p}</span>
+                                    <span className={formCSS.prefAns}>
+                                      {p || "No Answer"}
+                                    </span>
                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                   </span>
                                 ))

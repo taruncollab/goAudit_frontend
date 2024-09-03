@@ -50,7 +50,7 @@ export default function QuestionForm() {
 
   const [values, setValues] = useState({
     compId: { label: "", value: "" },
-    locId: { label: "", value: "" },
+    locId: [],
     categoryId: { label: "", value: "" },
     title: "",
     questions: [
@@ -73,8 +73,17 @@ export default function QuestionForm() {
   //Edit--
   useEffect(() => {
     if (id) {
-      const data = question && question?.find((f) => f?._id == id);
-      setValues(data);
+      let data = question && question?.find((f) => f?._id == id);
+
+      setValues({
+        ...data,
+        compId: { value: data?.compId?._id, label: data?.compId?.name },
+        locId: { value: data?.locId?._id, label: data?.locId?.locName },
+        categoryId: {
+          value: data?.categoryId?._id,
+          label: data?.categoryId?.name,
+        },
+      });
     }
   }, [id]);
 
@@ -386,8 +395,15 @@ export default function QuestionForm() {
 
     // Submit form--------------------------
 
+    const finalData = {
+      ...values,
+      compId: values.compId.value,
+      categoryId: values.categoryId.value,
+      createdBy: auth?._id,
+    };
+
     const action = id ? updateQuestionbyid : addQuestion;
-    const res = await dispatch(action({ ...values, createdBy: auth?._id }));
+    const res = await dispatch(action(finalData));
 
     if (res.type.includes("fulfilled")) {
       navigate("/question");
@@ -398,6 +414,7 @@ export default function QuestionForm() {
         title: "",
         questions: [{ question: "", type: "", prefAns: [], options: [] }],
       });
+
       Swal.fire({
         title: "Success",
         text: res.payload.message,
@@ -475,31 +492,62 @@ export default function QuestionForm() {
                   <InputLabel htmlFor="locId" className={questionCSS.outLabel}>
                     Location
                   </InputLabel>
-
-                  <Autocomplete
-                    id="locId"
-                    name="locId"
-                    options={locationOptions}
-                    getOptionLabel={(option) => option?.label || ""}
-                    value={values?.locId || null}
-                    onChange={(event, newValue) => {
-                      handleChange({
-                        target: {
-                          name: "locId",
-                          value: newValue || "",
-                        },
-                      });
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Select Location"
-                        size="small"
-                        variant="outlined"
-                        fullWidth
-                      />
-                    )}
-                  />
+                    {/* setup of Location field  */}
+                  {id ? (
+                    <Autocomplete
+                      id="locId"
+                      name="locId"
+                      // multiple
+                      filterSelectedOptions
+                      options={locationOptions}
+                      getOptionLabel={(option) => option?.label || ""}
+                      value={values?.locId || null}
+                      onChange={(event, newValue) => {
+                        handleChange({
+                          target: {
+                            name: "locId",
+                            value: newValue || "",
+                          },
+                        });
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Select Location"
+                          size="small"
+                          variant="outlined"
+                          fullWidth
+                        />
+                      )}
+                    />
+                  ) : (
+                    <Autocomplete
+                      id="locId"
+                      name="locId"
+                      multiple
+                      filterSelectedOptions
+                      options={locationOptions}
+                      getOptionLabel={(option) => option?.label || ""}
+                      value={values?.locId || null}
+                      onChange={(event, newValue) => {
+                        handleChange({
+                          target: {
+                            name: "locId",
+                            value: newValue || "",
+                          },
+                        });
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Select Location"
+                          size="small"
+                          variant="outlined"
+                          fullWidth
+                        />
+                      )}
+                    />
+                  )}
                 </Stack>
               </Grid>
 

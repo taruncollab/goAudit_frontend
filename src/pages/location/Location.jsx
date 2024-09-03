@@ -77,7 +77,7 @@ const Location = () => {
   const submitFun = async (values) => {
     if (formDrawer[1] !== null) {
       const res = await dispatch(
-        updateLocationbyid({ ...values, compId: selectedValue })
+        updateLocationbyid({ ...values, compId: selectedValue.value })
       );
       if (res.type.includes("fulfilled")) {
         setFormDrawer([false, null]);
@@ -92,7 +92,7 @@ const Location = () => {
       }
     } else {
       const res = await dispatch(
-        addLocation({ ...values, compId: selectedValue, createdBy: auth?._id })
+        addLocation({ ...values,  compId: selectedValue.value, createdBy: auth?._id })
       );
       if (res.type.includes("fulfilled")) {
         setFormDrawer([false, null]);

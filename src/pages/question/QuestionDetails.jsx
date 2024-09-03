@@ -10,7 +10,6 @@ import {
   AdsClick as AdsClickIcon,
   Edit as EditIcon,
   ReplyAll as ReplyAllIcon,
-  BorderColor as BorderColorIcon,
   FormatShapes as FormatShapesIcon,
   Draw as DrawIcon,
   Style as StyleIcon,
@@ -30,12 +29,19 @@ const QuestionDetails = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(getQuestions({}));
+      let data = question && question?.find((f) => f?._id == id);
 
-      const data = question && question?.find((f) => f?._id == id);
-      setDetails(data);
+      setDetails({
+        ...data,
+        compId: { value: data?.compId?._id, label: data?.compId?.name },
+        locId: { value: data?.locId?._id, label: data?.locId?.locName },
+        categoryId: {
+          value: data?.categoryId?._id,
+          label: data?.categoryId?.name,
+        },
+      });
     }
-  }, [id, details]);
+  }, [id]);
 
   return (
     <>
@@ -69,7 +75,7 @@ const QuestionDetails = () => {
               </Grid>
               <Grid item md={6} xs={6}>
                 <Typography className={questionCSS.value}>
-                  : {details?.locId?.label || "No Location Name"}
+                  : {details?.locId.label || "No Location Name"}
                 </Typography>
               </Grid>
             </Grid>

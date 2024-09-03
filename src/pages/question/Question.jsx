@@ -106,7 +106,7 @@ const Question = () => {
       headerName: <b>TITLE</b>,
       headerAlign: "center",
       headerClassName: questionCSS.headers,
-      align: "left",
+      align: "center",
       disableColumnMenu: true,
       sortable: false,
       width: 200,
@@ -116,14 +116,14 @@ const Question = () => {
       headerName: <b>CATEGORY</b>,
       headerAlign: "center",
       headerClassName: questionCSS.headers,
-      align: "left",
+      align: "center",
       disableColumnMenu: true,
       sortable: false,
       width: 200,
       renderCell: (params) => {
         return (
           <Chip
-            label={params?.row?.categoryId?.label || "No Category Name"}
+            label={params?.row?.categoryId?.name || "No Category Name"}
             variant="outlined"
             sx={{ borderColor: "#0672BC", color: "#0672BC" }}
             icon={<CategoryIcon />}
@@ -146,12 +146,12 @@ const Question = () => {
       headerClassName: questionCSS.headers,
       disableColumnMenu: true,
       sortable: false,
-      align: "left",
+      align: "center",
       width: 270,
       renderCell: (params) => {
         return (
           <Chip
-            label={params?.row?.compId?.label || "No Company Name"}
+            label={params?.row?.compId?.name || "No Company Name"}
             variant="outlined"
             sx={{ borderColor: "#0672BC", color: "#0672BC" }}
             icon={<CorporateFareIcon />}
@@ -164,14 +164,14 @@ const Question = () => {
       headerName: <b>LOCATION </b>,
       headerAlign: "center",
       headerClassName: questionCSS.headers,
-      align: "left",
+      align: "center",
       disableColumnMenu: true,
       sortable: false,
       width: 200,
       renderCell: (params) => {
         return (
           <Chip
-            label={params?.row?.locId?.label || "No Location"}
+            label={params?.row?.locId?.locName || "No Location"}
             variant="outlined"
             sx={{ borderColor: "#0672BC", color: "#0672BC" }}
             icon={<LocationOnIcon />}
@@ -254,7 +254,7 @@ const Question = () => {
                   backgroundColor: "#1182C574",
                 },
               }}
-              getRowId={(e) => e?._id}
+              getRowId={(e) => e?._id + 1}
               disableRowSelectionOnClick
             />
           ) : (

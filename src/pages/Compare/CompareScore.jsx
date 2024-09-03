@@ -130,7 +130,7 @@ const CompareScore = () => {
     const res = await dispatch(getFormbyLocId(values.locId?.value));
 
     if (res?.type?.includes("fulfilled")) {
-      if (res?.payload?.data.length > 0) {
+      if (res?.payload?.data?.length > 0) {
         setValues((prevValues) => ({
           ...prevValues,
           records: res?.payload?.data,

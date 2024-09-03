@@ -43,6 +43,7 @@ export default function FormDrawer(props) {
     loading,
   } = props;
 
+
   const handleImageRemove = () => {
     setUpload(null);
     setBase64(null);

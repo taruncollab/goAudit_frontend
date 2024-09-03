@@ -87,6 +87,8 @@ export default function Form() {
     }
   }, [id]);
 
+  console.log(values);
+
   // For Radio Button------------------------
 
   const handleChange = (e, index) => {
@@ -168,11 +170,20 @@ export default function Form() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (values?.formData?.map((f) => f?.answer?.length).includes(0)) {
+    if (values?.formData?.map((f) => f?.answer?.length)?.includes(0)) {
       return toast.warning("Please Answer All Questions");
     }
 
-    const res = await dispatch(addForm({ ...values, createdBy: auth?._id }));
+    const finalData = {
+      ...values,
+      compId: values?.compId?._id,
+      locId: values?.locId?._id,
+      categoryId: values?.categoryId?._id,
+      createdBy: auth?._id,
+    };
+
+    const res = await dispatch(addForm(finalData));
+
     if (res.type.includes("fulfilled")) {
       navigate("/formrecords");
       setValues({});
@@ -211,6 +222,59 @@ export default function Form() {
             alt="Fill Form Animation"
             className={formCSS.questionimage}
           />
+        </div>
+
+        <div
+          className={formCSS.header}
+          style={{
+            width: "100% !important",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Grid container item direction={"row"} ml={10}>
+            <Grid item xs={6}>
+              <Typography className={formCSS.key1}>Title</Typography>
+            </Grid>
+            <Grid item md={10} xs={6}>
+              <Typography className={formCSS.value1}>
+                {values?.title}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          <Grid container item direction={"row"}>
+            <Grid item xs={6}>
+              <Typography className={formCSS.key1}>Company</Typography>
+            </Grid>
+            <Grid item md={10} xs={6}>
+              <Typography className={formCSS.value1}>
+                {values?.compId?.name}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          <Grid container item direction={"row"}>
+            <Grid item xs={6}>
+              <Typography className={formCSS.key1}>Category</Typography>
+            </Grid>
+            <Grid item md={10} xs={6}>
+              <Typography className={formCSS.value1}>
+                {values?.categoryId?.name}
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container item direction={"row"}>
+            <Grid item xs={6}>
+              <Typography className={formCSS.key1}>Location</Typography>
+            </Grid>
+            <Grid item md={10} xs={6}>
+              <Typography className={formCSS.value1}>
+                {values?.locId?.locName}
+              </Typography>
+            </Grid>
+          </Grid>
         </div>
 
         <Grid item md={11} xs={11} mt={4} ml={3} mr={3}>

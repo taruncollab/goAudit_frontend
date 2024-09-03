@@ -57,7 +57,12 @@ const LiveLocations = (props) => {
 
   //Edit-------------------------------------
   const handleEdit = (id) => {
-    const data = location?.find((e) => e._id == id);
+    let data = location?.find((e) => e._id == id);
+    data = {
+      ...data,
+      compId: { value: data?.compId?._id, label: data?.compId?.name },
+    };
+
     setSelectedValue(data?.compId);
     setFormDrawer([true, data]);
   };
@@ -68,7 +73,7 @@ const LiveLocations = (props) => {
       const res = await dispatch(
         updateLocationbyid({
           ...values,
-          compId: selectedValue,
+          compId: selectedValue?.value,
         })
       );
 
@@ -83,6 +88,8 @@ const LiveLocations = (props) => {
           timerProgressBar: true,
           showConfirmButton: false,
         });
+
+        dispatch(getLocations({}));
       }
     }
   };
@@ -151,7 +158,7 @@ const LiveLocations = (props) => {
       renderCell: (params) => {
         return (
           <Chip
-            label={params?.row?.compId?.label || "No Company Name"}
+            label={params?.row?.compId?.name || "No Company Name"}
             variant="outlined"
             sx={{ borderColor: "#0672BC", color: "#0672BC" }}
             icon={<CorporateFareIcon />}

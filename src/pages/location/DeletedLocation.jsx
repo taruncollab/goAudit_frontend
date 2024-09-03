@@ -126,7 +126,7 @@ const DeletedLocation = () => {
       renderCell: (params) => {
         return (
           <Chip
-            label={params?.row?.compId?.label || "No Company Name"}
+            label={params?.row?.compId?.name || "No Company Name"}
             variant="outlined"
             sx={{ borderColor: "#0672BC", color: "#0672BC" }}
             icon={<CorporateFareIcon />}
