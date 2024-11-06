@@ -26,6 +26,7 @@ import {
 } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import { Camera } from "react-camera-pro";
 
 export default function Form() {
   const navigate = useNavigate();
@@ -346,6 +347,8 @@ export default function Form() {
                       </Grid>
 
                       <Grid item xs={12} md={2} ml={{ xs: 0, md: 3 }}>
+                        <Camera ref={camera} />
+
                         <Button
                           className={formCSS.remarkBtn}
                           size="small"
