@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { createRef, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import {
@@ -26,7 +26,6 @@ import {
 } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
-import { Camera } from "react-camera-pro";
 
 export default function Form() {
   const navigate = useNavigate();
@@ -56,16 +55,8 @@ export default function Form() {
         remark: "",
       },
     ],
-    // score: 0,
   });
-  const camera = useRef(null);
   const [image, setImage] = useState(null);
-  const [cameraVisible, setCameraVisible] = useState(false);
-  const [facingMode, setFacingMode] = useState("environment");
-
-  console.log(values, "values");
-
-  //Effect Zone---------------------
 
   useEffect(() => {
     if (id) {
@@ -88,14 +79,11 @@ export default function Form() {
           attachment: [],
           remark: "",
         })),
-        // score: 0,
       };
 
       setValues(newValues);
     }
   }, [id]);
-
-  // For Radio Button------------------------
 
   const handleChange = (e, index) => {
     const { value } = e.target;
@@ -123,20 +111,13 @@ export default function Form() {
   };
 
   const handleCheck = (option, index) => {
-    const isChecked = values.formData[index].answer.includes(
-      option.target.value
-    );
+    const isChecked = values.formData[index].answer.includes(option.target.value);
 
     if (isChecked) {
-      const updatedAnswer = values.formData[index].answer.filter(
-        (item) => item !== option.target.value
-      );
+      const updatedAnswer = values.formData[index].answer.filter(item => item !== option.target.value);
       updateFormData(index, updatedAnswer);
     } else {
-      const updatedAnswer = [
-        ...values.formData[index].answer,
-        option.target.value,
-      ];
+      const updatedAnswer = [...values.formData[index].answer, option.target.value];
       updateFormData(index, updatedAnswer);
     }
   };
@@ -146,8 +127,6 @@ export default function Form() {
     updatedValues.formData[index].answer = updatedAnswer;
     setValues(updatedValues);
   };
-
-  //Handle File Upload---with multiple base64------
 
   const handleSelectedFile = (event, index) => {
     const files = event.target.files;
@@ -160,48 +139,39 @@ export default function Form() {
 
     Array.from(files)?.forEach((file) => {
       const reader = new FileReader();
-
       reader.readAsDataURL(file);
       reader.onload = () => {
         const base64String = reader.result;
-
         updatedValues.formData[index].attachment.push(base64String);
-
         setValues({ ...updatedValues });
       };
-
       reader.onerror = (error) => {
         console.error("Error uploading file:", error);
       };
     });
   };
-
-  //Take Photo from Camera---
-
-  const handleOpenCamera = () => {
-    setCameraVisible(true);
-  };
-
-  const handleCloseCamera = () => {
-    setCameraVisible(false);
-  };
-
-  const handleSwitchCamera = () => {
-    setFacingMode((prevMode) =>
-      prevMode === "environment" ? "user" : "environment"
-    );
-  };
+ 
+  const cameraRefs = useRef([...Array(values.questions.length)].map(() => createRef()));
 
   const handleTakePhoto = (index) => {
-    const photo = camera.current.takePhoto();
+    // Capture photo from the corresponding camera
+    const photo = cameraRefs.current[index].current.takePhoto();
+    
+    // Update form data with the new photo
     const updatedValues = { ...values };
     updatedValues.formData[index].attachment.push(photo);
     setValues(updatedValues);
+
+    // Optionally display the captured image
     setImage(photo);
-    setCameraVisible(false); // Hide camera after capturing the photo
   };
 
-  // Handle Submit===================
+  const handleCameraClose = () => {
+    // Logic to close the camera
+    // if (camera.current) {
+    //   camera.current.stop();
+    // }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -260,59 +230,6 @@ export default function Form() {
           />
         </div>
 
-        <div
-          className={formCSS.header}
-          style={{
-            width: "100% !important",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Grid container item direction={"row"} ml={10}>
-            <Grid item xs={6}>
-              <Typography className={formCSS.key1}>Title</Typography>
-            </Grid>
-            <Grid item md={10} xs={6}>
-              <Typography className={formCSS.value1}>
-                {values?.title}
-              </Typography>
-            </Grid>
-          </Grid>
-
-          <Grid container item direction={"row"}>
-            <Grid item xs={6}>
-              <Typography className={formCSS.key1}>Company</Typography>
-            </Grid>
-            <Grid item md={10} xs={6}>
-              <Typography className={formCSS.value1}>
-                {values?.compId?.name}
-              </Typography>
-            </Grid>
-          </Grid>
-
-          <Grid container item direction={"row"}>
-            <Grid item xs={6}>
-              <Typography className={formCSS.key1}>Category</Typography>
-            </Grid>
-            <Grid item md={10} xs={6}>
-              <Typography className={formCSS.value1}>
-                {values?.categoryId?.name}
-              </Typography>
-            </Grid>
-          </Grid>
-          <Grid container item direction={"row"}>
-            <Grid item xs={6}>
-              <Typography className={formCSS.key1}>Location</Typography>
-            </Grid>
-            <Grid item md={10} xs={6}>
-              <Typography className={formCSS.value1}>
-                {values?.locId?.locName}
-              </Typography>
-            </Grid>
-          </Grid>
-        </div>
-
         <Grid item md={11} xs={11} mt={4} ml={3} mr={3}>
           <form noValidate>
             {values &&
@@ -361,10 +278,6 @@ export default function Form() {
                             }
                           />
                         </Button>
-                      </Grid>
-
-                      {/* <Grid item xs={12} md={2} ml={{ xs: 0, md: 3 }}>
-                        <Camera ref={camera} />
 
                         <Button
                           className={formCSS.remarkBtn}
@@ -376,76 +289,17 @@ export default function Form() {
                           <CameraAltIcon sx={{ mr: 1, color: "white" }} /> Take
                           photo
                         </Button>
-                      </Grid> */}
 
-                      <Grid
-                        item
-                        xs={12}
-                        md={4}
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          position: "relative",
-                        }}
-                      >
-                        {!cameraVisible && (
-                          <Button
-                            className={formCSS.remarkBtn}
-                            variant="contained"
-                            color="primary"
-                            onClick={handleOpenCamera}
-                          >
-                            <CameraAltIcon sx={{ mr: 1, color: "white" }} />{" "}
-                            Open Camera
-                          </Button>
-                        )}
-
-                        {cameraVisible && (
-                          <div style={{ position: "relative", width: "100%" }}>
-                            <Camera ref={camera} facingMode={facingMode} />
-
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              onClick={() => handleTakePhoto(index)}
-                              style={{
-                                position: "absolute",
-                                bottom: "10px",
-                                left: "50%",
-                                transform: "translateX(-50%)",
-                              }}
-                            >
-                              Capture Photo
-                            </Button>
-
-                            <Button
-                              variant="contained"
-                              color="secondary"
-                              onClick={handleCloseCamera}
-                              style={{
-                                position: "absolute",
-                                top: "10px",
-                                right: "10px",
-                              }}
-                            >
-                              Close
-                            </Button>
-
-                            <Button
-                              variant="contained"
-                              color="secondary"
-                              onClick={handleSwitchCamera}
-                              style={{
-                                position: "absolute",
-                                top: "10px",
-                                left: "10px",
-                              }}
-                            >
-                              Switch Camera
-                            </Button>
-                          </div>
-                        )}
+                        {/* Add camera stop button if needed */}
+                        <Button
+                          className={formCSS.remarkBtn}
+                          size="small"
+                          variant="contained"
+                          color="error"
+                          onClick={handleCameraClose}
+                        >
+                          Stop Camera
+                        </Button>
                       </Grid>
 
                       <Grid item xs={12} md={2} ml={{ xs: 0, md: 3 }}>
@@ -461,159 +315,83 @@ export default function Form() {
 
                     {/* Options here------------ */}
 
-                    {data?.type === "yes/no" && (
-                      //Radio Button---------------
-                      <Grid ml={3} mt={2} mb={1}>
-                        <FormControl component="fieldset">
-                          <RadioGroup
-                            aria-label="yes/no"
-                            name={inputName}
-                            value={values.formData[index]?.answer[0]}
-                            onChange={(e) => handleChange(e, index)}
-                          >
-                            <Stack direction={"row"} gap={2}>
-                              <FormControlLabel
-                                value="yes"
-                                control={<Radio />}
-                                label="Yes"
-                              />
-                              <FormControlLabel
-                                value="no"
-                                control={<Radio />}
-                                label="No"
-                              />
-                            </Stack>
-                          </RadioGroup>
-                        </FormControl>
-                      </Grid>
-                    )}
-
-                    {data?.type === "descriptive" && (
-                      <Grid ml={3} mr={3} mt={2} mb={1}>
-                        <TextareaAutosize
+                    {data?.type === "yesno" && (
+                      <FormControl>
+                        <RadioGroup
+                          row
                           name={inputName}
-                          value={values.formData[index].answer || ""}
-                          minRows={2}
-                          placeholder="Enter your answer...."
-                          style={{
-                            width: 380,
-                            borderRadius: "20px",
-                            borderColor: "#f77e09",
-                            padding: "10px",
-                            boxSizing: "border-box",
-                          }}
+                          value={values?.formData[index]?.answer}
                           onChange={(e) => handleChange(e, index)}
-                        />
-                      </Grid>
+                        >
+                          <FormControlLabel
+                            value="Yes"
+                            control={<Radio />}
+                            label="Yes"
+                          />
+                          <FormControlLabel
+                            value="No"
+                            control={<Radio />}
+                            label="No"
+                          />
+                        </RadioGroup>
+                      </FormControl>
                     )}
 
-                    {data?.type === "options" && (
-                      <Grid ml={3} mt={2} mb={1}>
-                        <FormControl component="fieldset">
-                          <RadioGroup
-                            aria-label="options"
-                            name={inputName}
-                            value={values.formData[index].selectedOption}
-                            onChange={(e) => handleChange(e, index)}
-                          >
-                            <Stack direction={"row"} gap={2}>
-                              {data?.options?.map((option, optionIndex) => (
-                                <FormControlLabel
-                                  key={optionIndex}
-                                  value={option}
-                                  control={<Radio />}
-                                  label={option}
-                                />
-                              ))}
-                            </Stack>
-                          </RadioGroup>
-                        </FormControl>
-                      </Grid>
+                    {data?.type === "multiple" && (
+                      <FormControl>
+                        <FormGroup>
+                          {data?.options.map((opt, i) => {
+                            return (
+                              <FormControlLabel
+                                key={i}
+                                control={
+                                  <Checkbox
+                                    value={opt}
+                                    checked={values?.formData[index]?.answer?.includes(opt)}
+                                    onChange={(e) => handleCheck(e, index)}
+                                  />
+                                }
+                                label={opt}
+                              />
+                            );
+                          })}
+                        </FormGroup>
+                      </FormControl>
                     )}
 
-                    {data?.type === "multichoice" && (
-                      <Grid ml={3} mt={1} mb={1}>
-                        <FormControl component="fieldset">
-                          <FormGroup>
-                            <Stack direction={"row"} gap={2}>
-                              {data?.options?.map((option, optionIndex) => (
-                                <FormControlLabel
-                                  key={optionIndex}
-                                  control={
-                                    <Checkbox
-                                      checked={values.formData[
-                                        index
-                                      ].answer?.includes(option)}
-                                      onChange={(e) => handleCheck(e, index)}
-                                      value={option}
-                                    />
-                                  }
-                                  label={option}
-                                />
-                              ))}
-                            </Stack>
-                          </FormGroup>
-                        </FormControl>
-                      </Grid>
+                    {data?.type === "text" && (
+                      <TextField
+                        variant="standard"
+                        name={inputName}
+                        value={values?.formData[index]?.answer}
+                        onChange={(e) => handleChange(e, index)}
+                        fullWidth
+                        required
+                      />
                     )}
-
-                    {openRemarkIndex === index && (
-                      <Grid ml={3} mr={3} mt={1} mb={1}>
-                        <TextField
-                          className="my-2"
-                          type="text"
-                          label="remarks"
-                          size="small"
-                          fullWidth
-                          name={remarkName}
-                          onChange={(e) => handleRemark(e, index)}
-                        />
-                      </Grid>
+                    {data?.type === "textarea" && (
+                      <TextareaAutosize
+                        style={{ width: "100%" }}
+                        minRows={5}
+                        name={inputName}
+                        value={values?.formData[index]?.answer}
+                        onChange={(e) => handleChange(e, index)}
+                      />
                     )}
-
-                    <Grid ml={3} mt={2} mb={1}>
-                      {data?.attachment?.map((imgSrc, imgIndex) => (
-                        <img
-                          key={imgIndex}
-                          src={imgSrc}
-                          alt={`Captured ${imgIndex + 1}`}
-                          style={{ width: 100, height: 100, marginTop: "10px" }}
-                        />
-                      ))}
-                    </Grid>
                   </Grid>
                 );
               })}
-            {/* </Grid> */}
-
-            <Stack
-              gap={2}
-              direction={"row"}
-              justifyContent={"flex-end"}
-              mt={3}
-              mb={2}
+            <Button
+              className={formCSS.submitBtn}
+              onClick={handleSubmit}
+              disabled={formLoading}
             >
-              {formLoading && formLoading ? (
-                <>
-                  <Button className={formCSS.submitBtn}>
-                    <CircularProgress /> Submitting...
-                  </Button>
-                </>
+              {formLoading ? (
+                <CircularProgress size={24} color="inherit" />
               ) : (
-                <>
-                  <Button className={formCSS.submitBtn} onClick={handleSubmit}>
-                    Submit
-                  </Button>
-                </>
+                "Submit"
               )}
-
-              <Button
-                className={formCSS.cancelBtn}
-                onClick={() => navigate(`/showforms`)}
-              >
-                Cancel
-              </Button>
-            </Stack>
+            </Button>
           </form>
         </Grid>
       </Grid>
