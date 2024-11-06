@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import {
@@ -25,6 +25,7 @@ import {
   Assignment as AssignmentIcon,
 } from "@mui/icons-material";
 import { toast } from "react-toastify";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
 
 export default function Form() {
   const navigate = useNavigate();
@@ -50,12 +51,16 @@ export default function Form() {
         options: [],
         prefAns: "",
         answer: [],
-        attachment: "",
+        attachment: [],
         remark: "",
       },
     ],
     // score: 0,
   });
+  const camera = useRef(null);
+  const [image, setImage] = useState(null);
+
+  console.log(values, "values");
 
   //Effect Zone---------------------
 
@@ -77,7 +82,7 @@ export default function Form() {
           options: q?.options || "",
           prefAns: q?.prefAns || "",
           answer: [],
-          attachment: "",
+          attachment: [],
           remark: "",
         })),
         // score: 0,
@@ -86,8 +91,6 @@ export default function Form() {
       setValues(newValues);
     }
   }, [id]);
-
-  console.log(values);
 
   // For Radio Button------------------------
 
@@ -141,28 +144,43 @@ export default function Form() {
     setValues(updatedValues);
   };
 
+  //Handle File Upload---with multiple base64------
+
   const handleSelectedFile = (event, index) => {
-    const file = event.target.files[0];
+    const files = event.target.files;
+    const updatedValues = { ...values };
 
-    const reader = new FileReader();
+    updatedValues.formData[index] = {
+      ...updatedValues.formData[index],
+      attachment: [],
+    };
 
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const base64String = reader.result;
+    Array.from(files)?.forEach((file) => {
+      const reader = new FileReader();
 
-      const updatedValues = { ...values };
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = reader.result;
 
-      updatedValues.formData[index] = {
-        ...updatedValues.formData[index],
-        attachment: base64String,
+        updatedValues.formData[index].attachment.push(base64String);
+
+        setValues({ ...updatedValues });
       };
 
-      setValues(updatedValues);
-    };
+      reader.onerror = (error) => {
+        console.error("Error uploading file:", error);
+      };
+    });
+  };
 
-    reader.onerror = (error) => {
-      console.error("Error uploading file:", error);
-    };
+  //Take Photo from Camera---
+
+  const handleTakePhoto = (index) => {
+    const photo = camera.current.takePhoto();
+    const updatedValues = { ...values };
+    updatedValues.formData[index].attachment.push(photo);
+    setValues(updatedValues);
+    setImage(photo); // Optional: display the captured image
   };
 
   // Handle Submit===================
@@ -316,6 +334,7 @@ export default function Form() {
                         <Button className={formCSS.attachmentBtn}>
                           <input
                             type="file"
+                            multiple
                             name={attachmentName}
                             id="attachment"
                             accept=".jpg, .png"
@@ -325,6 +344,20 @@ export default function Form() {
                           />
                         </Button>
                       </Grid>
+
+                      <Grid item xs={12} md={2} ml={{ xs: 0, md: 3 }}>
+                        <Button
+                          className={formCSS.remarkBtn}
+                          size="small"
+                          variant="contained"
+                          color="info"
+                          onClick={() => handleTakePhoto(index)}
+                        >
+                          <CameraAltIcon sx={{ mr: 1, color: "white" }} /> Take
+                          photo
+                        </Button>
+                      </Grid>
+
                       <Grid item xs={12} md={2} ml={{ xs: 0, md: 3 }}>
                         <Button
                           size="small"
@@ -447,6 +480,16 @@ export default function Form() {
                         />
                       </Grid>
                     )}
+
+                    <Grid ml={3} mt={2} mb={1}>
+                      {image && (
+                        <img
+                          src={image}
+                          alt="Captured"
+                          style={{ width: 100, height: 100 }}
+                        />
+                      )}
+                    </Grid>
                   </Grid>
                 );
               })}

@@ -209,33 +209,36 @@ const FormDetails = () => {
                             </Grid>
                           </Grid>
                         )}
+
                         {d?.attachment?.length > 0 && (
                           <Grid container item mt={2}>
                             <Grid item md={2} className={formCSS.questionKey}>
                               <AttachmentIcon sx={{ mr: 1 }} /> Attachment :
                             </Grid>
+
                             <Grid item md={10}>
-                              {d?.attachment ? (
-                                <Tooltip title="Download">
+                              {d?.attachment?.map((attachment, i) => (
+                                <Tooltip title="Download" key={i}>
                                   <a
-                                    href={d?.attachment}
+                                    href={attachment}
                                     download
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    style={{ marginRight: "10px" }}
                                   >
                                     <img
-                                      src={d?.attachment}
+                                      src={attachment}
                                       style={{
                                         width: "250px",
                                         height: "200px",
                                         objectFit: "contain",
+                                        margin: "10px 0",
                                       }}
+                                      alt={`attachment-${i}`}
                                     />
                                   </a>
                                 </Tooltip>
-                              ) : (
-                                <></>
-                              )}
+                              ))}
                             </Grid>
                           </Grid>
                         )}
