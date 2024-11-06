@@ -60,6 +60,8 @@ export default function Form() {
   });
   const camera = useRef(null);
   const [image, setImage] = useState(null);
+  const [cameraVisible, setCameraVisible] = useState(false);
+  const [facingMode, setFacingMode] = useState("environment");
 
   console.log(values, "values");
 
@@ -176,12 +178,27 @@ export default function Form() {
 
   //Take Photo from Camera---
 
+  const handleOpenCamera = () => {
+    setCameraVisible(true);
+  };
+
+  const handleCloseCamera = () => {
+    setCameraVisible(false);
+  };
+
+  const handleSwitchCamera = () => {
+    setFacingMode((prevMode) =>
+      prevMode === "environment" ? "user" : "environment"
+    );
+  };
+
   const handleTakePhoto = (index) => {
     const photo = camera.current.takePhoto();
     const updatedValues = { ...values };
     updatedValues.formData[index].attachment.push(photo);
     setValues(updatedValues);
-    setImage(photo); // Optional: display the captured image
+    setImage(photo);
+    setCameraVisible(false); // Hide camera after capturing the photo
   };
 
   // Handle Submit===================
@@ -346,7 +363,7 @@ export default function Form() {
                         </Button>
                       </Grid>
 
-                      <Grid item xs={12} md={2} ml={{ xs: 0, md: 3 }}>
+                      {/* <Grid item xs={12} md={2} ml={{ xs: 0, md: 3 }}>
                         <Camera ref={camera} />
 
                         <Button
@@ -359,6 +376,76 @@ export default function Form() {
                           <CameraAltIcon sx={{ mr: 1, color: "white" }} /> Take
                           photo
                         </Button>
+                      </Grid> */}
+
+                      <Grid
+                        item
+                        xs={12}
+                        md={4}
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          position: "relative",
+                        }}
+                      >
+                        {!cameraVisible && (
+                          <Button
+                            className={formCSS.remarkBtn}
+                            variant="contained"
+                            color="primary"
+                            onClick={handleOpenCamera}
+                          >
+                            <CameraAltIcon sx={{ mr: 1, color: "white" }} />{" "}
+                            Open Camera
+                          </Button>
+                        )}
+
+                        {cameraVisible && (
+                          <div style={{ position: "relative", width: "100%" }}>
+                            <Camera ref={camera} facingMode={facingMode} />
+
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={() => handleTakePhoto(index)}
+                              style={{
+                                position: "absolute",
+                                bottom: "10px",
+                                left: "50%",
+                                transform: "translateX(-50%)",
+                              }}
+                            >
+                              Capture Photo
+                            </Button>
+
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              onClick={handleCloseCamera}
+                              style={{
+                                position: "absolute",
+                                top: "10px",
+                                right: "10px",
+                              }}
+                            >
+                              Close
+                            </Button>
+
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              onClick={handleSwitchCamera}
+                              style={{
+                                position: "absolute",
+                                top: "10px",
+                                left: "10px",
+                              }}
+                            >
+                              Switch Camera
+                            </Button>
+                          </div>
+                        )}
                       </Grid>
 
                       <Grid item xs={12} md={2} ml={{ xs: 0, md: 3 }}>
@@ -485,13 +572,14 @@ export default function Form() {
                     )}
 
                     <Grid ml={3} mt={2} mb={1}>
-                      {image && (
+                      {data?.attachment?.map((imgSrc, imgIndex) => (
                         <img
-                          src={image}
-                          alt="Captured"
-                          style={{ width: 100, height: 100 }}
+                          key={imgIndex}
+                          src={imgSrc}
+                          alt={`Captured ${imgIndex + 1}`}
+                          style={{ width: 100, height: 100, marginTop: "10px" }}
                         />
-                      )}
+                      ))}
                     </Grid>
                   </Grid>
                 );
