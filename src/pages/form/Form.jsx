@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import {
@@ -26,6 +26,7 @@ import {
 } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import Webcam from "react-webcam";
 
 export default function Form() {
   const navigate = useNavigate();
@@ -57,8 +58,9 @@ export default function Form() {
     ],
     // score: 0,
   });
-  const camera = useRef(null);
-  const [image, setImage] = useState(null);
+
+  const webcamRef = useRef(null);
+  const [cameraIndex, setCameraIndex] = useState(null);
 
   console.log(values, "values");
 
@@ -175,13 +177,21 @@ export default function Form() {
 
   //Take Photo from Camera---
 
-  const handleTakePhoto = (index) => {
-    const photo = camera.current.takePhoto();
-    const updatedValues = { ...values };
-    updatedValues.formData[index].attachment.push(photo);
-    setValues(updatedValues);
-    setImage(photo); // Optional: display the captured image
+  const videoConstraints = {
+    width: 1280,
+    height: 720,
+    facingMode: "user",
   };
+
+  const capture = useCallback(
+    (index) => {
+      const imageSrc = webcamRef.current.getScreenshot();
+      const updatedValues = { ...values };
+      updatedValues.formData[index].attachment.push(imageSrc);
+      setValues(updatedValues);
+    },
+    [webcamRef, values]
+  );
 
   // Handle Submit===================
 
@@ -345,17 +355,49 @@ export default function Form() {
                         </Button>
                       </Grid>
 
+                      {/* For Web Camera-------------- */}
+
                       <Grid item xs={12} md={2} ml={{ xs: 0, md: 3 }}>
+                        {cameraIndex === index && (
+                          <Webcam
+                            audio={false}
+                            height={100}
+                            ref={webcamRef}
+                            screenshotFormat="image/jpeg"
+                            width={200}
+                            videoConstraints={videoConstraints}
+                          />
+                        )}
                         <Button
                           className={formCSS.remarkBtn}
                           size="small"
                           variant="contained"
                           color="info"
-                          onClick={() => handleTakePhoto(index)}
+                          onClick={() => {
+                            if (cameraIndex === index) {
+                              setCameraIndex(null);
+                            } else {
+                              setCameraIndex(index);
+                            }
+                          }}
                         >
-                          <CameraAltIcon sx={{ mr: 1, color: "white" }} /> Take
-                          photo
+                          <CameraAltIcon sx={{ mr: 1, color: "white" }} />
+                          {cameraIndex === index
+                            ? "Close Camera"
+                            : "Open Camera"}
                         </Button>
+
+                        {cameraIndex === index && (
+                          <Button
+                            className={formCSS.remarkBtn}
+                            size="small"
+                            variant="contained"
+                            color="info"
+                            onClick={() => capture(index)}
+                          >
+                            Capture Photo
+                          </Button>
+                        )}
                       </Grid>
 
                       <Grid item xs={12} md={2} ml={{ xs: 0, md: 3 }}>
@@ -481,7 +523,7 @@ export default function Form() {
                       </Grid>
                     )}
 
-                    <Grid ml={3} mt={2} mb={1}>
+                    {/* <Grid ml={3} mt={2} mb={1}>
                       {image && (
                         <img
                           src={image}
@@ -489,7 +531,7 @@ export default function Form() {
                           style={{ width: 100, height: 100 }}
                         />
                       )}
-                    </Grid>
+                    </Grid> */}
                   </Grid>
                 );
               })}
