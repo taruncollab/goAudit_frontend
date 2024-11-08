@@ -6,12 +6,13 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-const Camera = () => {
+const Camera = ({ Qindex }) => {
   const webcamRef = useRef(null);
   const [photos, setPhotos] = useState([]);
   const [recording, setRecording] = useState(false);
-  const [videoBlob, setVideoBlob] = useState(null);
+  const [videoBlobs, setVideoBlobs] = useState([]);
   const [facingMode, setFacingMode] = useState("user");
   const mediaRecorderRef = useRef(null);
   const recordedChunks = useRef([]);
@@ -42,7 +43,7 @@ const Camera = () => {
 
     mediaRecorderRef.current.onstop = () => {
       const blob = new Blob(recordedChunks.current, { type: "video/webm" });
-      setVideoBlob(blob);
+      setVideoBlobs((data) => [...data, blob]);
     };
 
     mediaRecorderRef.current.start();
@@ -59,7 +60,17 @@ const Camera = () => {
 
   const refresh = () => {
     setPhotos([]);
-    setVideoBlob(null);
+    setVideoBlobs([]);
+  };
+
+  // Remove specific photo by index
+  const removePhoto = (index) => {
+    setPhotos((data) => data.filter((_, i) => i !== index));
+  };
+
+  // Remove specific video by index
+  const removeVideo = (index) => {
+    setVideoBlobs((data) => data.filter((_, i) => i !== index));
   };
 
   return (
@@ -97,21 +108,33 @@ const Camera = () => {
 
       {/* Display captured photos */}
       {photos?.map((urlData, index) => (
-        <div key={index}>
+        <div key={index} style={{ position: "relative" }}>
           <img src={urlData} alt={`Screenshot ${index}`} />
+          <Button size="small" onClick={() => removePhoto(index)}>
+            <DeleteIcon sx={{ color: "red" }} />
+          </Button>
         </div>
       ))}
 
-      {/* Display recorded video if available */}
-      {videoBlob && (
-        <div>
-          <h3>Recorded Video:</h3>
-          <video src={URL.createObjectURL(videoBlob)} controls />
-          <a href={URL.createObjectURL(videoBlob)} download="video.webm">
+      {/* Display recorded videos */}
+      {videoBlobs?.map((blob, index) => (
+        <div key={index} style={{ position: "relative" }}>
+          <h3>Recorded Video {index + 1}:</h3>
+          <video src={URL.createObjectURL(blob)} controls />
+          <a
+            href={URL.createObjectURL(blob)}
+            download={`video${index + 1}.webm`}
+          >
             Download Video
           </a>
+          <Button
+            onClick={() => removeVideo(index)}
+            className={formCSS.remarkBtn}
+          >
+            <DeleteIcon sx={{ color: "red" }} />
+          </Button>
         </div>
-      )}
+      ))}
     </>
   );
 };

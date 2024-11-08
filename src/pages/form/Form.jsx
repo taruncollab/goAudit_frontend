@@ -40,6 +40,7 @@ export default function Form() {
   // State Zone---------------------
   const [openRemarkIndex, setOpenRemarkIndex] = useState([null, false]);
   const fileInputRefs = useRef([]);
+  const [openCameraIndex, setOpenCameraIndex] = useState(null);
   const [values, setValues] = useState({
     compId: "",
     locId: "",
@@ -317,11 +318,7 @@ export default function Form() {
           {values &&
             values?.formData?.map((data, index) => {
               const inputName = `formData${[index]}.answer`;
-              {
-                /* {
-                const attachmentName = `formData${[index]}.showAttachment`;
-              } */
-              }
+
               const remarkName = `formData${[index]}.remark`;
               return (
                 <Grid
@@ -461,8 +458,6 @@ export default function Form() {
                       </Button>
                     </Grid>
 
-                    <Camera />
-
                     <Grid item xs={12} md={12}>
                       {data?.showAttachment?.length > 0 && (
                         <>
@@ -545,7 +540,23 @@ export default function Form() {
                       )}
                     </Grid>
 
-                    {/* For Web Camera-------------- */}
+                    {/* Open Camera--------- */}
+
+                    {/* Camera Button */}
+                    <Grid item xs={12} md={2}>
+                      <Button
+                        size="small"
+                        className={formCSS.remarkBtn}
+                        onClick={() => setOpenCameraIndex(index)}
+                      >
+                        Open Camera
+                      </Button>
+                    </Grid>
+
+                    {openCameraIndex === index && <Camera index={index} />}
+
+                    {/* Open Camera--------- */}
+
                     <Grid item xs={12} md={2} ml={{ xs: 0, md: 0 }}>
                       <Button
                         size="small"
