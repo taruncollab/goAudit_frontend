@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import formCSS from "./form.module.scss";
-import { getForms } from "../../apis/formSlice";
+import { generateAuditReportPdF, getForms } from "../../apis/formSlice";
 import LoadingTable from "../../common/loadingTable";
 import {
   CorporateFare as CorporateFareIcon,
@@ -22,6 +22,7 @@ import {
   ReceiptLong as ReceiptLongIcon,
   RemoveRedEye as RemoveRedEyeIcon,
 } from "@mui/icons-material";
+import DownloadIcon from "@mui/icons-material/Download";
 
 const FormRecords = () => {
   const navigate = useNavigate();
@@ -72,6 +73,17 @@ const FormRecords = () => {
               <RemoveRedEyeIcon className={formCSS.infoBtn} />
             </IconButton>
           </Tooltip>
+
+          <a
+            href={`${
+              import.meta.env.VITE_BACKEND_PATH
+            }/form/generateFormReport/${params.row._id}`}
+            target="_blank"
+          >
+            <IconButton>
+              <DownloadIcon className={formCSS.infoBtn} />
+            </IconButton>
+          </a>
         </div>
       ),
     },

@@ -38,3 +38,9 @@ export const getUserName = (id, user) => {
   let data = user.find((item) => item._id == id);
   return data && data.name;
 };
+
+export const splitOnLastDot = (str) => {
+  const result = str.split(/\.([^.]*)$/);
+  const newStr = result.length > 1 ? [result[0], result[1]] : [str];
+  return newStr[1].toLowerCase();
+}

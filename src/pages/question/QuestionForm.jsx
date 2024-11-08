@@ -334,7 +334,6 @@ export default function QuestionForm() {
   };
 
   const handlePreferredChange = (questionIndex, option) => {
-    console.log(option, "option");
     setValues((prevValues) => {
       const updatedQuestions = [...prevValues.questions];
 
@@ -492,7 +491,7 @@ export default function QuestionForm() {
                   <InputLabel htmlFor="locId" className={questionCSS.outLabel}>
                     Location
                   </InputLabel>
-                    {/* setup of Location field  */}
+                  {/* setup of Location field  */}
                   {id ? (
                     <Autocomplete
                       id="locId"

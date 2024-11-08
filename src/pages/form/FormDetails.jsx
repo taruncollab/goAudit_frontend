@@ -16,6 +16,7 @@ import {
   Draw as DrawIcon,
 } from "@mui/icons-material";
 import { Download as DownloadIcon } from "@mui/icons-material"; // Importing Material UI Download icon
+import { splitOnLastDot } from "../../common/common";
 
 const FormDetails = () => {
   const { id } = useParams();
@@ -27,8 +28,6 @@ const FormDetails = () => {
   // State Zone---------------------
 
   const [details, setDetails] = useState(null);
-
-  console.log(details, "details");
 
   //Effect Zone---------------------
 
@@ -219,11 +218,7 @@ const FormDetails = () => {
 
                         <Grid item md={10}>
                           {d?.attachment?.map((attachment, i) => {
-                            const fileExtension = attachment?.Location.split(
-                              "/"
-                            )
-                              .pop()
-                              .toLowerCase();
+                            const fileExtension = splitOnLastDot(attachment?.Location);
 
                             const isImage = [
                               "jpg",

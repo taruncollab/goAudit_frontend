@@ -64,8 +64,6 @@ export default function Form() {
     // score: 0,
   });
 
-  console.log(photos, "photos");
-
   //Effect Zone---------------------
   useEffect(() => {
     if (id) {
@@ -183,12 +181,12 @@ export default function Form() {
     }
   };
 
-  const toggleCamera = (index) => {
-    setOpenCameraIndex((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
-  };
+  // const toggleCamera = (index) => {
+  //   setOpenCameraIndex((prev) => ({
+  //     ...prev,
+  //     [index]: !prev[index],
+  //   }));
+  // };
 
   // Handle Submit===================
 
