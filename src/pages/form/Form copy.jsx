@@ -24,9 +24,8 @@ import {
   NoteAlt as NoteAltIcon,
   Assignment as AssignmentIcon,
 } from "@mui/icons-material";
-import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
-import Camera from "./camera";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function Form() {
   const navigate = useNavigate();
@@ -187,9 +186,11 @@ export default function Form() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (values?.formData?.map((f) => f?.answer?.length)?.includes(0)) {
-      return toast.warning("Please Answer All Questions");
-    }
+    // if (values?.formData?.map((f) => f?.answer?.length)?.includes(0)) {
+    //   return toast.warning("Please Answer All Questions");
+    // }
+
+    console.log(values, "values=========== 1");
 
     // Upload the file to S3
 
@@ -200,6 +201,8 @@ export default function Form() {
       categoryId: values?.categoryId?._id,
       createdBy: auth?._id,
     };
+
+    console.log(finalData, "finalData===========");
 
     const res = await dispatch(addForm(finalData));
 
@@ -460,9 +463,6 @@ export default function Form() {
                         />
                       </Button>
                     </Grid>
-
-                    <Camera />
-
                     <Grid item xs={12} md={12}>
                       {data?.showAttachment?.length > 0 && (
                         <>

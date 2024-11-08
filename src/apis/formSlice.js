@@ -52,6 +52,22 @@ export const getFormbyLocId = createAsyncThunk(
   }
 );
 
+export const addImages = createAsyncThunk(
+  "addImages",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_PATH}/form/addImages/${data.id}`,
+        data.formData,
+        apiHeader
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const formSliceDetails = createSlice({
   name: "formSliceDetails",
   initialState: {
@@ -104,6 +120,31 @@ const formSliceDetails = createSlice({
         state.formLoading = false;
         state.error = action.payload;
       });
+
+    //Add Images--------
+
+    // .addCase(addImages.pending, (state) => {
+    //   state.formLoading = true;
+    //   state.error = null;
+    // })
+
+    // .addCase(addImages.fulfilled, (state, action) => {
+    //   state.formLoading = false;
+    //   const { data } = action.payload;
+
+    //   state.form = state.form.map((item) =>
+    //     item._id === data._id
+    //       ? { ...item, attachment: data.attachment }
+    //       : item
+    //   );
+
+    //   state.error = null;
+    // })
+
+    // .addCase(addImages.rejected, (state, action) => {
+    //   state.formLoading = false;
+    //   state.error = action.payload;
+    // });
   },
 });
 
