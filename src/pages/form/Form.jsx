@@ -40,7 +40,7 @@ export default function Form() {
   // State Zone---------------------
   const [openRemarkIndex, setOpenRemarkIndex] = useState([null, false]);
   const fileInputRefs = useRef([]);
-  const [openCameraIndex, setOpenCameraIndex] = useState(null);
+  const [openCameraIndex, setOpenCameraIndex] = useState([null, false]);
   const [values, setValues] = useState({
     compId: "",
     locId: "",
@@ -547,13 +547,17 @@ export default function Form() {
                       <Button
                         size="small"
                         className={formCSS.remarkBtn}
-                        onClick={() => setOpenCameraIndex(index)}
+                        onClick={() =>
+                          setOpenCameraIndex([index, !openCameraIndex[1]])
+                        }
                       >
                         Open Camera
                       </Button>
                     </Grid>
 
-                    {openCameraIndex === index && <Camera index={index} />}
+                    {openCameraIndex[1] && openCameraIndex[0] === index && (
+                      <Camera index={index} />
+                    )}
 
                     {/* Open Camera--------- */}
 
