@@ -77,35 +77,8 @@ const Appbar = () => {
                 <img src={menu} alt="menu" />
                 {/* <MenuIcon style={{ marginLeft: "1.5rem", color: "#000" }} /> */}
               </IconButton>
-
-              {/* ---------------------------------Search-------------------------------------------------------- */}
-
-              {/* <div>
-                <TextField
-                  fullWidth
-                  size="small"
-                  placeholder="Search"
-                  // onChange={searchData}
-                  // className={companyCSS.searchBar}
-                  InputProps={{
-                    disableUnderline: true,
-                    // sx: {
-                    //   border: "none",
-                    //   "& .MuiOutlinedInput-notchedOutline": {
-                    //     border: "none",
-                    //   },
-                    // },
-                  }}
-                />
-              </div> */}
             </div>
             <div className={style.appbar_right}>
-              {/* ---------------------------------notification-------------------------------------------------------- */}
-              {/* <Badge badgeContent={46} color="error">
-                <IconButton className={style.noti}>
-                  <img src={notification} alt="notification" />
-                </IconButton>
-              </Badge> */}
               <Button
                 variant="contained"
                 aria-controls={openMenu ? "basic-menu" : undefined}

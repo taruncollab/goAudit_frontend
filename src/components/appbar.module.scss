@@ -25,14 +25,6 @@
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
-    .noti {
-      // background: linear-gradient(#0672BC #30AFDC);
-      background: linear-gradient(to bottom, #0672bc 0%, #30afdc 100%);
-    }
-    .noti img {
-      width: 1.5rem;
-      padding: 0 3px;
-    }
 
     .profile {
       background-color: #e2e2e2;
@@ -40,21 +32,10 @@
       border-radius: 30px;
       padding: 1 !important;
       box-shadow: none !important;
-      // border: 2px solid #0672BC;
-    }
-    .profile img {
-      width: 2rem;
-      // border: 2px solid #0672BC;
-      // border-radius: 50%;
     }
 
-    .profile:hover {
-      background-color: #e2e2e2;
-      margin: 0 0 0 1.5rem;
-      border-radius: 30px;
-      padding: 1 !important;
-      // border: 2px solid #0672BC;
-      box-shadow: none !important;
+    .profile img {
+      width: 2rem;
     }
 
     .btnText {
@@ -63,24 +44,41 @@
       justify-content: center;
       align-items: center;
       padding: 0rem 0.7rem;
+
       .btnTextName {
         color: #000;
         font-size: 14px;
         margin-bottom: 0;
       }
+
       .btnTextRole {
         color: #0672bc;
         font-size: 11px;
         margin-top: 0;
       }
     }
+
     .arrow {
       color: #0672bc;
     }
   }
+
+  @media (max-width: 600px) {
+    .appbar_left {
+      .menu {
+        margin-left: 1rem;
+      }
+    }
+
+    .appbar_right {
+      .profile {
+        padding: 0 !important;
+      }
+    }
+  }
 }
 
-// ================================================================================================
+// Sidebar & Menu Specific Styles
 .menus {
   border-top-right-radius: 25px !important;
   border-bottom-right-radius: 25px !important;
@@ -90,6 +88,7 @@
   font-weight: bold !important;
   color: #000;
 }
+
 .active {
   background: linear-gradient(to bottom, #30afdc 0%, #0672bc 100%);
   border-top-right-radius: 25px !important;
@@ -110,6 +109,7 @@
   color: #000;
   margin-left: 15px;
 }
+
 .activeIcon {
   color: #fff;
   margin-left: 15px;

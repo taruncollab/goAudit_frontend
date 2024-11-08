@@ -8,7 +8,7 @@ import StopCircleIcon from "@mui/icons-material/StopCircle";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Camera = ({photos, setPhotos, videoBlobs, setVideoBlobs}) => {
+const Camera = ({ photos, setPhotos, videoBlobs, setVideoBlobs }) => {
   const webcamRef = useRef(null);
   // const [photos, setPhotos] = useState([]);
   // const [videoBlobs, setVideoBlobs] = useState([]);

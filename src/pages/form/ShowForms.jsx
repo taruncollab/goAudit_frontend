@@ -183,7 +183,7 @@ const ShowForms = () => {
           <Typography className={formCSS.title}>FILL FORM</Typography>
         </Grid>
 
-        <Grid item md={4} xs={10} ml={4} mt={2} mr={3}>
+        <Grid item md={4} xs={5} ml={4} mt={2} mr={3}>
           <TextField
             fullWidth
             size="small"
@@ -202,7 +202,7 @@ const ShowForms = () => {
           />
         </Grid>
 
-        <Grid item md={12} xs={12} ml={4} mt={3} mr={3}>
+        <Grid item md={12} xs={11} ml={4} mt={3} mr={3}>
           {questionLoading ? (
             <LoadingTable />
           ) : question && question?.length > 0 ? (
@@ -254,7 +254,7 @@ const ShowForms = () => {
               },
               "& .MuiPaginationItem-page.Mui-selected": {
                 backgroundColor: "#0672bc",
-                color: "black",
+                color: "white",
               },
               "& .MuiPaginationItem-page:hover": {
                 backgroundColor: "#0672bc",

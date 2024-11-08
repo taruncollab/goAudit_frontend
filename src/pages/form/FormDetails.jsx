@@ -15,6 +15,7 @@ import {
   NoteAlt as NoteAltIcon,
   Draw as DrawIcon,
 } from "@mui/icons-material";
+import { Download as DownloadIcon } from "@mui/icons-material"; // Importing Material UI Download icon
 
 const FormDetails = () => {
   const { id } = useParams();
@@ -27,16 +28,21 @@ const FormDetails = () => {
 
   const [details, setDetails] = useState(null);
 
+  console.log(details, "details");
+
   //Effect Zone---------------------
 
   //Edit-----
   useEffect(() => {
     if (id) {
       dispatch(getForms({}));
-      const data = form && form?.find((f) => f?._id == id);
-      setDetails(data);
     }
-  }, [id, dispatch]);
+  }, [id]);
+
+  useEffect(() => {
+    const data = form && form?.find((f) => f?._id == id);
+    setDetails(data);
+  }, [form, id]);
 
   return (
     <>
@@ -83,7 +89,7 @@ const FormDetails = () => {
               </Grid>
               <Grid item md={6} xs={6}>
                 <Typography className={formCSS.value}>
-                  : {details?.compId?.label || "No Company Name"}
+                  : {(details && details?.compId?.name) || "No Company Name"}
                 </Typography>
               </Grid>
             </Grid>
@@ -93,7 +99,7 @@ const FormDetails = () => {
               </Grid>
               <Grid item md={6} xs={6}>
                 <Typography className={formCSS.value}>
-                  : {details?.locId[0]?.label || "No Location Name"}
+                  : {(details && details?.locId?.locName) || "No Location Name"}
                 </Typography>
               </Grid>
             </Grid>
@@ -103,7 +109,8 @@ const FormDetails = () => {
               </Grid>
               <Grid item md={6} xs={6}>
                 <Typography className={formCSS.value}>
-                  : {details?.categoryId?.label || "No Category Name"}
+                  :{" "}
+                  {(details && details?.categoryId?.name) || "No Category Name"}
                 </Typography>
               </Grid>
             </Grid>
@@ -114,7 +121,7 @@ const FormDetails = () => {
               </Grid>
               <Grid item md={6} xs={6}>
                 <Typography className={formCSS.ScoreTitle}>
-                  : {details?.score || "No Data"}
+                  : {(details && details?.score) || "No Data"}
                 </Typography>
               </Grid>
             </Grid>
@@ -210,24 +217,44 @@ const FormDetails = () => {
                           </Grid>
                         )}
 
-                        {d?.attachment?.length > 0 && (
-                          <Grid container item mt={2}>
-                            <Grid item md={2} className={formCSS.questionKey}>
-                              <AttachmentIcon sx={{ mr: 1 }} /> Attachment :
-                            </Grid>
+                        <Grid item md={10}>
+                          {d?.attachment?.map((attachment, i) => {
+                            const fileExtension = attachment?.Location.split(
+                              "/"
+                            )
+                              .pop()
+                              .toLowerCase();
 
-                            <Grid item md={10}>
-                              {d?.attachment?.map((attachment, i) => (
-                                <Tooltip title="Download" key={i}>
-                                  <a
-                                    href={attachment}
-                                    download
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{ marginRight: "10px" }}
-                                  >
+                            const isImage = [
+                              "jpg",
+                              "jpeg",
+                              "png",
+                              "gif",
+                              "bmp",
+                            ]?.includes(fileExtension);
+
+                            const isVideo = [
+                              "mp4",
+                              "mov",
+                              "avi",
+                              "mkv",
+                              "webm",
+                            ]?.includes(fileExtension);
+
+                            const isPdf = fileExtension === "pdf";
+
+                            return (
+                              <Tooltip title="Download" key={i}>
+                                <a
+                                  href={attachment?.Location}
+                                  download
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{ marginRight: "10px" }}
+                                >
+                                  {isImage && (
                                     <img
-                                      src={attachment}
+                                      src={attachment?.Location}
                                       style={{
                                         width: "250px",
                                         height: "200px",
@@ -236,12 +263,40 @@ const FormDetails = () => {
                                       }}
                                       alt={`attachment-${i}`}
                                     />
-                                  </a>
-                                </Tooltip>
-                              ))}
-                            </Grid>
-                          </Grid>
-                        )}
+                                  )}
+
+                                  {isVideo && (
+                                    <video
+                                      width="250"
+                                      height="200"
+                                      style={{ margin: "10px 0" }}
+                                      controls
+                                      alt={`attachment-${i}`}
+                                    >
+                                      <source
+                                        src={attachment?.Location}
+                                        type={`video/${fileExtension}`}
+                                      />
+                                      Your browser does not support the video
+                                      tag.
+                                    </video>
+                                  )}
+
+                                  {isPdf && (
+                                    <embed
+                                      src={attachment?.Location}
+                                      width="250"
+                                      height="200"
+                                      type="application/pdf"
+                                      style={{ margin: "10px 0" }}
+                                      alt={`attachment-${i}`}
+                                    />
+                                  )}
+                                </a>
+                              </Tooltip>
+                            );
+                          })}
+                        </Grid>
                       </Grid>
                     </CardContent>
                   </Card>

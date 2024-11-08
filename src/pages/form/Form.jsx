@@ -40,7 +40,7 @@ export default function Form() {
   // State Zone---------------------
   const [openRemarkIndex, setOpenRemarkIndex] = useState([null, false]);
   const fileInputRefs = useRef([]);
-  const [openCameraIndex, setOpenCameraIndex] = useState([null, false]);
+  const [openCameraIndex, setOpenCameraIndex] = useState({});
   const [photos, setPhotos] = useState([]);
   const [videoBlobs, setVideoBlobs] = useState([]);
   const [values, setValues] = useState({
@@ -183,6 +183,13 @@ export default function Form() {
     }
   };
 
+  const toggleCamera = (index) => {
+    setOpenCameraIndex((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
   // Handle Submit===================
 
   const handleSubmit = async (event) => {
@@ -318,6 +325,7 @@ export default function Form() {
           {values &&
             values?.formData?.map((data, index) => {
               const inputName = `formData${[index]}.answer`;
+              const attachment = `formData${[index]}.attachment`;
 
               const remarkName = `formData${[index]}.remark`;
               return (
@@ -329,15 +337,13 @@ export default function Form() {
                   key={index}
                   className={formCSS.questionBox}
                 >
-                  <Typography pt={2} ml={3}>
-                    <img
-                      src="/src/assets/Question.png"
-                      style={{
-                        width: "25px",
-                        height: "25px",
-                        marginRight: "5px",
-                      }}
-                    />
+                  <Typography
+                    pt={2}
+                    ml={3}
+                    sx={{ fontWeight: "bold", display: "flex", gap: 1 }}
+                  >
+                    <span className={formCSS.questionText}>{index + 1}.</span>
+
                     <span className={formCSS.questionText}>{data?.text}</span>
                   </Typography>
 
@@ -474,6 +480,11 @@ export default function Form() {
                                         gap: "10px",
                                       }}
                                     >
+                                      <img
+                                        style={{ width: "100px" }}
+                                        src={URL.createObjectURL(file)}
+                                      ></img>
+
                                       <CloseIcon
                                         color="error"
                                         onClick={() =>
@@ -489,7 +500,7 @@ export default function Form() {
                           <br />
                           <b>Videos</b>
                           <Grid container spacing={1}>
-                            {data.showAttachment
+                            {data?.showAttachment
                               .filter((file) => file.type.startsWith("video"))
                               .map((file, aIndex) => (
                                 <Grid item xs={12} md={12} key={aIndex}>
@@ -499,6 +510,9 @@ export default function Form() {
                                       gap: "10px",
                                     }}
                                   >
+                                    <video style={{ width: "150px" }} controls>
+                                      <source src={URL.createObjectURL(file)} />
+                                    </video>
                                     <CloseIcon
                                       color="error"
                                       onClick={() => removeFile(index, aIndex)}
@@ -524,6 +538,15 @@ export default function Form() {
                                         gap: "10px",
                                       }}
                                     >
+                                      {file.type === "application/pdf" && (
+                                        <embed
+                                          src={URL.createObjectURL(file)}
+                                          width="200px"
+                                          height="200px"
+                                          type="application/pdf"
+                                        />
+                                      )}
+
                                       <CloseIcon
                                         color="error"
                                         onClick={() =>
@@ -542,23 +565,15 @@ export default function Form() {
 
                     {/* Open Camera--------- */}
 
-                    {/* Camera Button */}
-                    <Grid item xs={12} md={2}>
-                      <Button
-                        size="small"
-                        className={formCSS.remarkBtn}
-                        onClick={() =>
-                          setOpenCameraIndex([index, !openCameraIndex[1]])
-                        }
-                      >
-                        {openCameraIndex[1] == true &&
-                        openCameraIndex[0] === index
-                          ? "Close Camera"
-                          : "Open Camera"}
-                      </Button>
-                    </Grid>
+                    {/* <Button
+                      size="small"
+                      className={formCSS.remarkBtn}
+                      onClick={() => toggleCamera(index)}
+                    >
+                      {openCameraIndex[index] ? "Close Camera" : "Open Camera"}
+                    </Button>
 
-                    {openCameraIndex[1] && openCameraIndex[0] === index && (
+                    {openCameraIndex[index] && (
                       <Camera
                         index={index}
                         photos={photos}
@@ -566,11 +581,11 @@ export default function Form() {
                         videoBlobs={videoBlobs}
                         setVideoBlobs={setVideoBlobs}
                       />
-                    )}
+                    )} */}
 
                     {/* Open Camera--------- */}
 
-                    <Grid item xs={12} md={2} ml={{ xs: 0, md: 0 }}>
+                    {/* <Grid item xs={12} md={2} ml={{ xs: 0, md: 0 }}>
                       <Button
                         size="small"
                         className={formCSS.remarkBtn}
@@ -580,10 +595,10 @@ export default function Form() {
                       >
                         <NoteAltIcon sx={{ mr: 1 }} /> Add remarks
                       </Button>
-                    </Grid>
+                    </Grid> */}
                   </Grid>
 
-                  {openRemarkIndex[1] && openRemarkIndex[0] === index && (
+                  {/* {openRemarkIndex[1] && openRemarkIndex[0] === index && (
                     <Grid ml={3} mr={3} mt={1} mb={1}>
                       <TextField
                         className="my-2"
@@ -595,7 +610,19 @@ export default function Form() {
                         onChange={(e) => handleRemark(e, index)}
                       />
                     </Grid>
-                  )}
+                  )} */}
+
+                  <Grid ml={2} mr={3} mt={1} mb={1}>
+                    <TextField
+                      className="my-2"
+                      type="text"
+                      label="Remarks"
+                      size="small"
+                      fullWidth
+                      name={remarkName}
+                      onChange={(e) => handleRemark(e, index)}
+                    />
+                  </Grid>
                 </Grid>
               );
             })}

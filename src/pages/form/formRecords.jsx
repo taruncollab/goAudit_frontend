@@ -187,14 +187,14 @@ const FormRecords = () => {
 
   return (
     <>
-      <Grid container>
+      <Grid container spacing={2}>
         <Grid item xs={12} mt={2} container justifyContent={"space-between"}>
           <Typography className={formCSS.title}>
             <ReceiptLongIcon style={{ fontSize: "26px" }} /> FORM RECORD
           </Typography>
         </Grid>
 
-        <Grid item md={4} xs={10} ml={4} mt={2} mr={3}>
+        <Grid item xs={12} sm={6} md={4} mt={2} ml={2} mr={2}>
           <TextField
             fullWidth
             size="small"
@@ -213,7 +213,7 @@ const FormRecords = () => {
           />
         </Grid>
 
-        <Grid item md={12} xs={12} ml={4} mt={3} mr={3}>
+        <Grid item xs={11.5} mt={3} ml={2} mr={2}>
           {formLoading ? (
             <LoadingTable />
           ) : form && form?.length > 0 ? (
@@ -252,7 +252,7 @@ const FormRecords = () => {
           )}
         </Grid>
 
-        <Box className="mt-3 mb-3">
+        <Grid item xs={12} className="mt-3 mb-3">
           <Pagination
             count={totalPages}
             page={currentPage}
@@ -263,7 +263,7 @@ const FormRecords = () => {
               },
               "& .MuiPaginationItem-page.Mui-selected": {
                 backgroundColor: "#0672bc",
-                color: "black",
+                color: "white",
               },
               "& .MuiPaginationItem-page:hover": {
                 backgroundColor: "#0672bc",
@@ -271,7 +271,7 @@ const FormRecords = () => {
               },
             }}
           />
-        </Box>
+        </Grid>
       </Grid>
     </>
   );

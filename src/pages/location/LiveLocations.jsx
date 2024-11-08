@@ -230,7 +230,7 @@ const LiveLocations = (props) => {
 
   return (
     <>
-      <Grid item md={4} xs={10} ml={4} mt={2} mr={3}>
+      <Grid item md={4} xs={4} ml={4} mt={2} mr={3}>
         <TextField
           fullWidth
           size="small"
@@ -249,7 +249,7 @@ const LiveLocations = (props) => {
         />
       </Grid>
 
-      <Grid item md={12} xs={12} ml={4} mt={3} mr={3}>
+      <Grid item md={12} xs={11} ml={4} mt={3} mr={3}>
         {locationLoading ? (
           <LoadingTable />
         ) : location && location?.length > 0 ? (
@@ -295,7 +295,7 @@ const LiveLocations = (props) => {
             },
             "& .MuiPaginationItem-page.Mui-selected": {
               backgroundColor: "#0672bc",
-              color: "black",
+              color: "white",
             },
             "& .MuiPaginationItem-page:hover": {
               backgroundColor: "#0672bc",
