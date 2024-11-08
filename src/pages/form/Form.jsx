@@ -41,6 +41,8 @@ export default function Form() {
   const [openRemarkIndex, setOpenRemarkIndex] = useState([null, false]);
   const fileInputRefs = useRef([]);
   const [openCameraIndex, setOpenCameraIndex] = useState([null, false]);
+  const [photos, setPhotos] = useState([]);
+  const [videoBlobs, setVideoBlobs] = useState([]);
   const [values, setValues] = useState({
     compId: "",
     locId: "",
@@ -61,6 +63,8 @@ export default function Form() {
     ],
     // score: 0,
   });
+
+  console.log(photos, "photos");
 
   //Effect Zone---------------------
   useEffect(() => {
@@ -150,22 +154,19 @@ export default function Form() {
     const files = event.target.files;
     const updatedValues = { ...values };
 
-    // Helper function to convert a file to a base64 string
     const fileToBase64 = (file) => {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
         reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(file); // Read file as data URL (base64 encoded)
+        reader.readAsDataURL(file);
       });
     };
 
-    // Convert each file to base64
     const base64Files = await Promise.all(
       Array.from(files).map((file) => fileToBase64(file))
     );
 
-    // Update the formData with both the base64-converted files and the original files
     updatedValues.formData[index] = {
       ...updatedValues.formData[index],
       attachment: [...updatedValues.formData[index].attachment, ...base64Files],
@@ -177,7 +178,6 @@ export default function Form() {
 
     setValues({ ...updatedValues });
 
-    // Clear the file input value after processing
     if (fileInputRefs.current[index]) {
       fileInputRefs.current[index].value = "";
     }
@@ -551,12 +551,21 @@ export default function Form() {
                           setOpenCameraIndex([index, !openCameraIndex[1]])
                         }
                       >
-                        Open Camera
+                        {openCameraIndex[1] == true &&
+                        openCameraIndex[0] === index
+                          ? "Close Camera"
+                          : "Open Camera"}
                       </Button>
                     </Grid>
 
                     {openCameraIndex[1] && openCameraIndex[0] === index && (
-                      <Camera index={index} />
+                      <Camera
+                        index={index}
+                        photos={photos}
+                        setPhotos={setPhotos}
+                        videoBlobs={videoBlobs}
+                        setVideoBlobs={setVideoBlobs}
+                      />
                     )}
 
                     {/* Open Camera--------- */}

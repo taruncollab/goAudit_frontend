@@ -8,11 +8,11 @@ import StopCircleIcon from "@mui/icons-material/StopCircle";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Camera = ({ Qindex }) => {
+const Camera = ({photos, setPhotos, videoBlobs, setVideoBlobs}) => {
   const webcamRef = useRef(null);
-  const [photos, setPhotos] = useState([]);
+  // const [photos, setPhotos] = useState([]);
+  // const [videoBlobs, setVideoBlobs] = useState([]);
   const [recording, setRecording] = useState(false);
-  const [videoBlobs, setVideoBlobs] = useState([]);
   const [facingMode, setFacingMode] = useState("user");
   const mediaRecorderRef = useRef(null);
   const recordedChunks = useRef([]);
