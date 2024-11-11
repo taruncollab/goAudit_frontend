@@ -65,7 +65,6 @@ export default function Form() {
   const [signatures, setSignatures] = useState([null, null, null]);
   const sigCanvas = [useRef(), useRef(), useRef()];
 
-  console.log(signatures, "signatures");
   //Effect Zone---------------------
   useEffect(() => {
     if (id) {
@@ -660,48 +659,66 @@ export default function Form() {
             mr={3}
             mt={3}
             mb={1}
-            sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+            }}
           >
             <div>
               <h6>Signature Here...</h6>
 
-              {imageURL?.length > 0 &&
+              {imageURL?.length > 0 ? (
                 imageURL?.map((image, index) => (
-                  <img
-                    key={`image-${index}`}
-                    src={image}
-                    alt={`Person ${index + 1} Photo`}
+                  <div
+                    key={`pair-${index}`}
                     style={{
-                      width: "100px",
-                      height: "100px",
-                      marginTop: "10px",
-                      marginLeft: "20px",
+                      display: "flex",
+                      alignItems: "center",
+                      marginTop: "15px",
+                      border: "1px solid #ccc",
+                      padding: "10px",
+                      borderRadius: "10px",
                     }}
-                  />
-                ))}
-
-              <br />
-              <br />
-              <br />
-              {signatures?.length > 0 &&
-                signatures?.map((sign, index) => (
-                  <>
+                  >
+                    {/* Displaying photo */}
                     <img
-                      key={`sign-${index}`}
-                      src={sign}
-                      alt={`Person ${index + 1} Signature`}
+                      src={image}
+                      alt={`Person ${index + 1} Photo`}
                       style={{
                         width: "100px",
                         height: "100px",
-                        marginTop: "10px",
-                        marginLeft: "20px",
+                        marginRight: "20px",
                       }}
                     />
-                    <h6
-                      style={{ marginTop: "10px", marginLeft: "20px" }}
-                    >{`Person ${index + 1}`}</h6>
-                  </>
-                ))}
+
+                    {signatures?.[index] ? (
+                      <div style={{ textAlign: "center" }}>
+                        <img
+                          src={signatures[index]}
+                          alt={`Person ${index + 1} Signature`}
+                          style={{
+                            width: "100px",
+                            height: "100px",
+                          }}
+                        />
+                        <h6 style={{ marginTop: "10px" }}>{`Person ${
+                          index + 1
+                        }`}</h6>
+                      </div>
+                    ) : (
+                      <div style={{ textAlign: "center", marginLeft: "20px" }}>
+                        <h6 style={{ marginTop: "10px" }}>
+                          Signature not uploaded
+                        </h6>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <h6 style={{ marginTop: "10px" }}>
+                  No photos or signatures uploaded
+                </h6>
+              )}
             </div>
           </Grid>
 
