@@ -126,6 +126,7 @@ const FormDetails = () => {
             </Grid>
           </Grid>
         </Grid>
+
         {details &&
           details?.formData?.map((d, i) => {
             return (
