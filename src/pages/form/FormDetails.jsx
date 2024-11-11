@@ -308,72 +308,73 @@ const FormDetails = () => {
                       </Grid>
                     </CardContent>
                   </Card>
-
-                  <Card sx={{ mt: 2, p: 2 }}>
-                    <h6>Signature Here...</h6>
-
-                    {details?.cameraImages?.length > 0 ? (
-                      details?.cameraImages?.map((data, index) => (
-                        <div
-                          key={`pair-${index}`}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            marginTop: "15px",
-                            border: "1px solid #ccc",
-                            padding: "10px",
-                            borderRadius: "10px",
-                          }}
-                        >
-                          {/* Displaying photo */}
-                          <img
-                            src={data?.Location}
-                            alt={`Person ${index + 1} Photo`}
-                            style={{
-                              width: "100px",
-                              height: "100px",
-                              marginRight: "20px",
-                            }}
-                          />
-
-                          {details?.signatures?.[index] ? (
-                            <div style={{ textAlign: "center" }}>
-                              <img
-                                src={details?.signatures[index]?.Location}
-                                alt={`Person ${index + 1} Signature`}
-                                style={{
-                                  width: "100px",
-                                  height: "100px",
-                                }}
-                              />
-                              <h6 style={{ marginTop: "10px" }}>{`Person ${
-                                index + 1
-                              }`}</h6>
-                            </div>
-                          ) : (
-                            <div
-                              style={{
-                                textAlign: "center",
-                                marginLeft: "20px",
-                              }}
-                            >
-                              <h6 style={{ marginTop: "10px" }}>
-                                Signature not uploaded
-                              </h6>
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      <h6 style={{ marginTop: "10px" }}>
-                        No photos or signatures uploaded
-                      </h6>
-                    )}
-                  </Card>
                 </Grid>
               </>
             );
           })}
+
+        {/* //Show Signature Here---- */}
+        <Card sx={{ p: 2, mb: 2 }}>
+          <h6>Signature Here...</h6>
+
+          {details?.cameraImages?.length > 0 ? (
+            details?.cameraImages?.map((data, index) => (
+              <div
+                key={`pair-${index}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginTop: "15px",
+                  border: "1px solid #ccc",
+                  padding: "10px",
+                  borderRadius: "10px",
+                }}
+              >
+                {/* Displaying photo */}
+                <img
+                  src={data?.Location}
+                  alt={`Person ${index + 1} Photo`}
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    marginRight: "20px",
+                  }}
+                />
+
+                {details?.signatures?.[index] ? (
+                  <div style={{ textAlign: "center" }}>
+                    <img
+                      src={details?.signatures[index]?.Location}
+                      alt={`Person ${index + 1} Signature`}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                      }}
+                    />
+                    <h6 style={{ marginTop: "10px" }}>{`Person ${
+                      index + 1
+                    }`}</h6>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      marginLeft: "20px",
+                    }}
+                  >
+                    <h6 style={{ marginTop: "10px" }}>
+                      Signature not uploaded
+                    </h6>
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <h6 style={{ marginTop: "10px" }}>
+              No photos or signatures uploaded
+            </h6>
+          )}
+        </Card>
       </Grid>
     </>
   );
