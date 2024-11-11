@@ -23,6 +23,7 @@ import Swal from "sweetalert2";
 import {
   NoteAlt as NoteAltIcon,
   Assignment as AssignmentIcon,
+  ImageNotSupported,
 } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
@@ -64,9 +65,7 @@ export default function Form() {
   const [signatures, setSignatures] = useState([null, null, null]);
   const sigCanvas = [useRef(), useRef(), useRef()];
 
-  console.log(signatures, "aaaaaaaa");
-  console.log(imageURL, "camera Photo");
-
+  console.log(signatures, "signatures");
   //Effect Zone---------------------
   useEffect(() => {
     if (id) {
@@ -184,13 +183,6 @@ export default function Form() {
     }
   };
 
-  // const toggleCamera = (index) => {
-  //   setOpenCameraIndex((prev) => ({
-  //     ...prev,
-  //     [index]: !prev[index],
-  //   }));
-  // };
-
   // Handle Submit===================
 
   const handleSubmit = async (event) => {
@@ -208,6 +200,8 @@ export default function Form() {
       locId: values?.locId?._id,
       categoryId: values?.categoryId?._id,
       createdBy: auth?._id,
+      signatures: signatures,
+      cameraImages: imageURL,
     };
 
     const res = await dispatch(addForm(finalData));
@@ -659,6 +653,56 @@ export default function Form() {
               setSignatures={setSignatures}
               sigCanvas={sigCanvas}
             />
+          </Grid>
+
+          <Grid
+            ml={1}
+            mr={3}
+            mt={3}
+            mb={1}
+            sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}
+          >
+            <div>
+              <h6>Signature Here...</h6>
+
+              {imageURL?.length > 0 &&
+                imageURL?.map((image, index) => (
+                  <img
+                    key={`image-${index}`}
+                    src={image}
+                    alt={`Person ${index + 1} Photo`}
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      marginTop: "10px",
+                      marginLeft: "20px",
+                    }}
+                  />
+                ))}
+
+              <br />
+              <br />
+              <br />
+              {signatures?.length > 0 &&
+                signatures?.map((sign, index) => (
+                  <>
+                    <img
+                      key={`sign-${index}`}
+                      src={sign}
+                      alt={`Person ${index + 1} Signature`}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        marginTop: "10px",
+                        marginLeft: "20px",
+                      }}
+                    />
+                    <h6
+                      style={{ marginTop: "10px", marginLeft: "20px" }}
+                    >{`Person ${index + 1}`}</h6>
+                  </>
+                ))}
+            </div>
           </Grid>
 
           <Stack
