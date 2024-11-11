@@ -1,49 +1,53 @@
-/* Center the loader spinner on the screen */
 .loading-spinner {
-    position: fixed; /* Fixes the position relative to the viewport */
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    background-color: rgba(255, 255, 255, 0.8); /* Optional: semi-transparent background */
-    z-index: 9999; /* Ensure the spinner is on top of other content */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+}
+
+/* Loader animation styles */
+.loader {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ffa516;
+  animation: l3-1 2s infinite linear, l3-2 3s infinite steps(1) -0.5s;
+}
+
+@keyframes l3-1 {
+  0% {
+    transform: perspective(150px) rotateX(0deg) rotateY(0deg);
   }
-  
-  /* Loader animation styles */
-  .loader {
-    width: 40px;
-    height: 40px; /* Ensure it has equal height for a square shape */
-    border-radius: 50%; /* Circular shape */
-    background: #ffa516; /* Initial background color */
-    animation: l3-1 2s infinite linear, l3-2 3s infinite steps(1) -0.5s;
+  50% {
+    transform: perspective(150px) rotateX(180deg) rotateY(0deg);
   }
-  
-  /* Keyframes for rotation and perspective effect */
-  @keyframes l3-1 {
-    0% {
-      transform: perspective(150px) rotateX(0deg) rotateY(0deg);
-    }
-    50% {
-      transform: perspective(150px) rotateX(180deg) rotateY(0deg);
-    }
-    100% {
-      transform: perspective(150px) rotateX(180deg) rotateY(180deg);
-    }
+  100% {
+    transform: perspective(150px) rotateX(180deg) rotateY(180deg);
   }
-  
-  /* Keyframes for color changing effect */
-  @keyframes l3-2 {
-    0% {
-      background: #0482a8;
-    }
-    33% {
-      background: #f03355;
-    }
-    66% {
-      background: #25b09b;
-    }
+}
+
+@keyframes l3-2 {
+  0% {
+    background: #0482a8;
   }
-  
+  33% {
+    background: #f03355;
+  }
+  66% {
+    background: #25b09b;
+  }
+}
+
+/* Style for Signature Canvas */
+
+.signatureCanvas {
+  border: 1px solid black;
+  width: 100%;
+  min-height: 500px;
+}

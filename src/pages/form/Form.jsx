@@ -26,7 +26,7 @@ import {
 } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
-import Camera from "./camera";
+import DigitalSignModel from "./DigitalSign";
 
 export default function Form() {
   const navigate = useNavigate();
@@ -38,11 +38,7 @@ export default function Form() {
   const { formLoading } = useSelector((state) => state.formData);
 
   // State Zone---------------------
-  const [openRemarkIndex, setOpenRemarkIndex] = useState([null, false]);
   const fileInputRefs = useRef([]);
-  const [openCameraIndex, setOpenCameraIndex] = useState({});
-  const [photos, setPhotos] = useState([]);
-  const [videoBlobs, setVideoBlobs] = useState([]);
   const [values, setValues] = useState({
     compId: "",
     locId: "",
@@ -63,6 +59,13 @@ export default function Form() {
     ],
     // score: 0,
   });
+  const [open, setOpen] = useState(false);
+  const [imageURL, setImageURL] = useState([null, null, null]);
+  const [signatures, setSignatures] = useState([null, null, null]);
+  const sigCanvas = [useRef(), useRef(), useRef()];
+
+  console.log(signatures, "aaaaaaaa");
+  console.log(imageURL, "camera Photo");
 
   //Effect Zone---------------------
   useEffect(() => {
@@ -327,224 +330,200 @@ export default function Form() {
 
               const remarkName = `formData${[index]}.remark`;
               return (
-                <Grid
-                  container
-                  direction={"column"}
-                  mt={1}
-                  mb={2}
-                  key={index}
-                  className={formCSS.questionBox}
-                >
-                  <Typography
-                    pt={2}
-                    ml={3}
-                    sx={{ fontWeight: "bold", display: "flex", gap: 1 }}
-                  >
-                    <span className={formCSS.questionText}>{index + 1}.</span>
-
-                    <span className={formCSS.questionText}>{data?.text}</span>
-                  </Typography>
-
-                  {data?.type === "yes/no" && (
-                    <Grid ml={3} mt={2} mb={1}>
-                      <FormControl component="fieldset">
-                        <RadioGroup
-                          aria-label="yes/no"
-                          name={inputName}
-                          value={values.formData[index]?.answer[0]}
-                          onChange={(e) => handleChange(e, index)}
-                        >
-                          <Stack direction={"row"} gap={2}>
-                            <FormControlLabel
-                              value="yes"
-                              control={<Radio />}
-                              label="Yes"
-                            />
-                            <FormControlLabel
-                              value="no"
-                              control={<Radio />}
-                              label="No"
-                            />
-                          </Stack>
-                        </RadioGroup>
-                      </FormControl>
-                    </Grid>
-                  )}
-
-                  {data?.type === "descriptive" && (
-                    <Grid ml={3} mr={3} mt={2} mb={1}>
-                      <TextareaAutosize
-                        name={inputName}
-                        value={values.formData[index].answer || ""}
-                        minRows={2}
-                        placeholder="Enter your answer...."
-                        style={{
-                          width: 380,
-                          borderRadius: "20px",
-                          borderColor: "#f77e09",
-                          padding: "10px",
-                          boxSizing: "border-box",
-                        }}
-                        onChange={(e) => handleChange(e, index)}
-                      />
-                    </Grid>
-                  )}
-
-                  {data?.type === "options" && (
-                    <Grid ml={3} mt={2} mb={1}>
-                      <FormControl component="fieldset">
-                        <RadioGroup
-                          aria-label="options"
-                          name={inputName}
-                          value={values.formData[index].selectedOption}
-                          onChange={(e) => handleChange(e, index)}
-                        >
-                          <Stack direction={"row"} gap={2}>
-                            {data?.options?.map((option, optionIndex) => (
-                              <FormControlLabel
-                                key={optionIndex}
-                                value={option}
-                                control={<Radio />}
-                                label={option}
-                              />
-                            ))}
-                          </Stack>
-                        </RadioGroup>
-                      </FormControl>
-                    </Grid>
-                  )}
-
-                  {data?.type === "multichoice" && (
-                    <Grid ml={3} mt={1} mb={1}>
-                      <FormControl component="fieldset">
-                        <FormGroup>
-                          <Stack direction={"row"} gap={2}>
-                            {data?.options?.map((option, optionIndex) => (
-                              <FormControlLabel
-                                key={optionIndex}
-                                control={
-                                  <Checkbox
-                                    checked={values.formData[
-                                      index
-                                    ].answer?.includes(option)}
-                                    onChange={(e) => handleCheck(e, index)}
-                                    value={option}
-                                  />
-                                }
-                                label={option}
-                              />
-                            ))}
-                          </Stack>
-                        </FormGroup>
-                      </FormControl>
-                    </Grid>
-                  )}
-
+                <>
                   <Grid
                     container
-                    alignItems={"center"}
-                    justifyContent={"flex-start"}
-                    spacing={1}
+                    direction={"column"}
                     mt={1}
-                    ml={1}
+                    mb={2}
+                    key={index}
+                    className={formCSS.questionBox}
                   >
-                    <Grid item xs={12} md={12}>
-                      <Button className={formCSS.attachmentBtn}>
-                        <input
-                          type="file"
-                          multiple
-                          name="attachments"
-                          id="attachment"
-                          accept=".jpg, .png, .pdf, .mp4"
-                          ref={(el) => (fileInputRefs.current[index] = el)}
-                          onChange={(event) => handleSelectedFile(event, index)}
+                    <Typography
+                      pt={2}
+                      ml={3}
+                      sx={{ fontWeight: "bold", display: "flex", gap: 1 }}
+                    >
+                      <span className={formCSS.questionText}>{index + 1}.</span>
+
+                      <span className={formCSS.questionText}>{data?.text}</span>
+                    </Typography>
+
+                    {data?.type === "yes/no" && (
+                      <Grid ml={3} mt={2} mb={1}>
+                        <FormControl component="fieldset">
+                          <RadioGroup
+                            aria-label="yes/no"
+                            name={inputName}
+                            value={values.formData[index]?.answer[0]}
+                            onChange={(e) => handleChange(e, index)}
+                          >
+                            <Stack direction={"row"} gap={2}>
+                              <FormControlLabel
+                                value="yes"
+                                control={<Radio />}
+                                label="Yes"
+                              />
+                              <FormControlLabel
+                                value="no"
+                                control={<Radio />}
+                                label="No"
+                              />
+                            </Stack>
+                          </RadioGroup>
+                        </FormControl>
+                      </Grid>
+                    )}
+
+                    {data?.type === "descriptive" && (
+                      <Grid ml={3} mr={3} mt={2} mb={1}>
+                        <TextareaAutosize
+                          name={inputName}
+                          value={values.formData[index].answer || ""}
+                          minRows={2}
+                          placeholder="Enter your answer...."
+                          style={{
+                            width: 380,
+                            borderRadius: "20px",
+                            borderColor: "#f77e09",
+                            padding: "10px",
+                            boxSizing: "border-box",
+                          }}
+                          onChange={(e) => handleChange(e, index)}
                         />
-                      </Button>
-                    </Grid>
+                      </Grid>
+                    )}
 
-                    <Grid item xs={12} md={12}>
-                      {data?.showAttachment?.length > 0 && (
-                        <>
-                          <b style={{ marginBottom: "1rem" }}>Images</b>
-                          <Grid container spacing={1}>
-                            {data.showAttachment
-                              ?.filter((file) => file.type.startsWith("image"))
-                              .map((file, aIndex) => (
-                                <Grid item xs={12} md={12} key={aIndex}>
-                                  <div className="file-item">
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        gap: "10px",
-                                      }}
-                                    >
-                                      <img
-                                        style={{ width: "100px" }}
-                                        src={URL.createObjectURL(file)}
-                                      ></img>
-
-                                      <CloseIcon
-                                        color="error"
-                                        onClick={() =>
-                                          removeFile(index, aIndex)
-                                        }
-                                      />
-                                      <p>{file.name}</p>
-                                    </div>
-                                  </div>
-                                </Grid>
+                    {data?.type === "options" && (
+                      <Grid ml={3} mt={2} mb={1}>
+                        <FormControl component="fieldset">
+                          <RadioGroup
+                            aria-label="options"
+                            name={inputName}
+                            value={values.formData[index].selectedOption}
+                            onChange={(e) => handleChange(e, index)}
+                          >
+                            <Stack direction={"row"} gap={2}>
+                              {data?.options?.map((option, optionIndex) => (
+                                <FormControlLabel
+                                  key={optionIndex}
+                                  value={option}
+                                  control={<Radio />}
+                                  label={option}
+                                />
                               ))}
-                          </Grid>
-                          <br />
-                          <b>Videos</b>
-                          <Grid container spacing={1}>
-                            {data?.showAttachment
-                              .filter((file) => file.type.startsWith("video"))
-                              .map((file, aIndex) => (
-                                <Grid item xs={12} md={12} key={aIndex}>
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      gap: "10px",
-                                    }}
-                                  >
-                                    <video style={{ width: "150px" }} controls>
-                                      <source src={URL.createObjectURL(file)} />
-                                    </video>
-                                    <CloseIcon
-                                      color="error"
-                                      onClick={() => removeFile(index, aIndex)}
+                            </Stack>
+                          </RadioGroup>
+                        </FormControl>
+                      </Grid>
+                    )}
+
+                    {data?.type === "multichoice" && (
+                      <Grid ml={3} mt={1} mb={1}>
+                        <FormControl component="fieldset">
+                          <FormGroup>
+                            <Stack direction={"row"} gap={2}>
+                              {data?.options?.map((option, optionIndex) => (
+                                <FormControlLabel
+                                  key={optionIndex}
+                                  control={
+                                    <Checkbox
+                                      checked={values.formData[
+                                        index
+                                      ].answer?.includes(option)}
+                                      onChange={(e) => handleCheck(e, index)}
+                                      value={option}
                                     />
-                                    <p>{file.name}</p>
-                                  </div>
-                                </Grid>
+                                  }
+                                  label={option}
+                                />
                               ))}
-                          </Grid>
-                          <br />
-                          <b>Documents</b>
-                          <Grid container spacing={1}>
-                            {data?.showAttachment
-                              ?.filter((file) =>
-                                file.type.startsWith("application")
-                              )
-                              ?.map((file, aIndex) => (
-                                <Grid item xs={12} md={12} key={aIndex}>
-                                  <div className="file-item">
+                            </Stack>
+                          </FormGroup>
+                        </FormControl>
+                      </Grid>
+                    )}
+
+                    <Grid
+                      container
+                      alignItems={"center"}
+                      justifyContent={"flex-start"}
+                      spacing={1}
+                      mt={1}
+                      ml={1}
+                    >
+                      <Grid item xs={12} md={12}>
+                        <Button>
+                          <input
+                            type="file"
+                            multiple
+                            name="attachments"
+                            id="attachment"
+                            accept=".jpg, .png, .pdf, .mp4"
+                            ref={(el) => (fileInputRefs.current[index] = el)}
+                            onChange={(event) =>
+                              handleSelectedFile(event, index)
+                            }
+                          />
+                        </Button>
+                      </Grid>
+
+                      <Grid item xs={12} md={12}>
+                        {data?.showAttachment?.length > 0 && (
+                          <>
+                            <b style={{ marginBottom: "1rem" }}>Images</b>
+                            <Grid container spacing={1}>
+                              {data.showAttachment
+                                ?.filter((file) =>
+                                  file.type.startsWith("image")
+                                )
+                                .map((file, aIndex) => (
+                                  <Grid item xs={12} md={12} key={aIndex}>
+                                    <div className="file-item">
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          gap: "10px",
+                                        }}
+                                      >
+                                        <img
+                                          style={{ width: "100px" }}
+                                          src={URL.createObjectURL(file)}
+                                        ></img>
+
+                                        <CloseIcon
+                                          color="error"
+                                          onClick={() =>
+                                            removeFile(index, aIndex)
+                                          }
+                                        />
+                                        <p>{file.name}</p>
+                                      </div>
+                                    </div>
+                                  </Grid>
+                                ))}
+                            </Grid>
+                            <br />
+                            <b>Videos</b>
+                            <Grid container spacing={1}>
+                              {data?.showAttachment
+                                .filter((file) => file.type.startsWith("video"))
+                                .map((file, aIndex) => (
+                                  <Grid item xs={12} md={12} key={aIndex}>
                                     <div
                                       style={{
                                         display: "flex",
                                         gap: "10px",
                                       }}
                                     >
-                                      {file.type === "application/pdf" && (
-                                        <embed
+                                      <video
+                                        style={{ width: "150px" }}
+                                        controls
+                                      >
+                                        <source
                                           src={URL.createObjectURL(file)}
-                                          width="200px"
-                                          height="200px"
-                                          type="application/pdf"
                                         />
-                                      )}
-
+                                      </video>
                                       <CloseIcon
                                         color="error"
                                         onClick={() =>
@@ -553,17 +532,53 @@ export default function Form() {
                                       />
                                       <p>{file.name}</p>
                                     </div>
-                                  </div>
-                                </Grid>
-                              ))}
-                          </Grid>
-                        </>
-                      )}
-                    </Grid>
+                                  </Grid>
+                                ))}
+                            </Grid>
+                            <br />
+                            <b>Documents</b>
+                            <Grid container spacing={1}>
+                              {data?.showAttachment
+                                ?.filter((file) =>
+                                  file.type.startsWith("application")
+                                )
+                                ?.map((file, aIndex) => (
+                                  <Grid item xs={12} md={12} key={aIndex}>
+                                    <div className="file-item">
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          gap: "10px",
+                                        }}
+                                      >
+                                        {file.type === "application/pdf" && (
+                                          <embed
+                                            src={URL.createObjectURL(file)}
+                                            width="200px"
+                                            height="200px"
+                                            type="application/pdf"
+                                          />
+                                        )}
 
-                    {/* Open Camera--------- */}
+                                        <CloseIcon
+                                          color="error"
+                                          onClick={() =>
+                                            removeFile(index, aIndex)
+                                          }
+                                        />
+                                        <p>{file.name}</p>
+                                      </div>
+                                    </div>
+                                  </Grid>
+                                ))}
+                            </Grid>
+                          </>
+                        )}
+                      </Grid>
 
-                    {/* <Button
+                      {/* Open Camera--------- */}
+
+                      {/* <Button
                       size="small"
                       className={formCSS.remarkBtn}
                       onClick={() => toggleCamera(index)}
@@ -581,9 +596,9 @@ export default function Form() {
                       />
                     )} */}
 
-                    {/* Open Camera--------- */}
+                      {/* Open Camera--------- */}
 
-                    {/* <Grid item xs={12} md={2} ml={{ xs: 0, md: 0 }}>
+                      {/* <Grid item xs={12} md={2} ml={{ xs: 0, md: 0 }}>
                       <Button
                         size="small"
                         className={formCSS.remarkBtn}
@@ -594,9 +609,9 @@ export default function Form() {
                         <NoteAltIcon sx={{ mr: 1 }} /> Add remarks
                       </Button>
                     </Grid> */}
-                  </Grid>
+                    </Grid>
 
-                  {/* {openRemarkIndex[1] && openRemarkIndex[0] === index && (
+                    {/* {openRemarkIndex[1] && openRemarkIndex[0] === index && (
                     <Grid ml={3} mr={3} mt={1} mb={1}>
                       <TextField
                         className="my-2"
@@ -610,20 +625,42 @@ export default function Form() {
                     </Grid>
                   )} */}
 
-                  <Grid ml={2} mr={3} mt={1} mb={1}>
-                    <TextField
-                      className="my-2"
-                      type="text"
-                      label="Remarks"
-                      size="small"
-                      fullWidth
-                      name={remarkName}
-                      onChange={(e) => handleRemark(e, index)}
-                    />
+                    <Grid ml={2} mr={3} mt={1} mb={1}>
+                      <TextField
+                        className="my-2"
+                        type="text"
+                        label="Remarks"
+                        size="small"
+                        fullWidth
+                        name={remarkName}
+                        onChange={(e) => handleRemark(e, index)}
+                      />
+                    </Grid>
                   </Grid>
-                </Grid>
+                </>
               );
             })}
+
+          {/* Signature Part */}
+
+          <Grid
+            ml={1}
+            mr={3}
+            mt={3}
+            mb={1}
+            sx={{ display: "flex", justifyContent: "left", alignItems: "left" }}
+          >
+            <DigitalSignModel
+              open={open}
+              setOpen={setOpen}
+              imageURL={imageURL}
+              setImageURL={setImageURL}
+              signatures={signatures}
+              setSignatures={setSignatures}
+              sigCanvas={sigCanvas}
+            />
+          </Grid>
+
           <Stack
             gap={2}
             direction={"row"}
