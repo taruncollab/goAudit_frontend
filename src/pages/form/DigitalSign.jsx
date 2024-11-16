@@ -36,7 +36,8 @@ export default function DigitalSignModel({
 
   // State for person names
   const [personNames, setPersonNames] = useState(["", "", ""]);
-  const [degisnation, setDegisnation] = useState([
+  const [designation, setDesignation
+  ] = useState([
     "Operation Manager's Signature",
     "Outlet Manager's Signature",
     "Franchise Owner's Signature",
@@ -105,7 +106,7 @@ export default function DigitalSignModel({
         signatures,
         cameraImages: imageURL,
         personNames,
-        degisnation,
+        designation,
       };
 
       console.log(finalData);
