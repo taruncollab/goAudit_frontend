@@ -111,14 +111,14 @@ export default function DigitalSignModel({
 
       console.log(finalData);
 
-      // const res = await dispatch(updateFormnById(finalData));
+      const res = await dispatch(updateFormnById(finalData));
 
-      // if (res.type.includes("fulfilled")) {
-      //   toast.success(res.payload.message);
-      //   setOpen(false);
-      // } else {
-      //   toast.warning(res.payload.message);
-      // }
+      if (res.type.includes("fulfilled")) {
+        toast.success(res.payload.message);
+        setOpen(false);
+      } else {
+        toast.warning(res.payload.message);
+      }
     } catch (error) {
       toast.error("Failed to submit. Please try again.");
     }
