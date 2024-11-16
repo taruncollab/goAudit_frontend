@@ -315,7 +315,7 @@ const FormDetails = () => {
           })}
 
         {/* //Show Signature Here---- */}
-        <Card sx={{ p: 2, mb: 2 }}>
+        <Card sx={{ p: 5, mb: 2, width: "97.5%", borderRadius: "10px" }}>
           <h6>Signature Here...</h6>
 
           {details?.cameraImages?.length > 0 ? (
@@ -352,9 +352,11 @@ const FormDetails = () => {
                         height: "100px",
                       }}
                     />
-                    <h6 style={{ marginTop: "10px" }}>{`Person ${
-                      index + 1
-                    }`}</h6>
+                    <h6 style={{ marginTop: "10px" }}>{
+                      details?.personNames[index]}</h6>
+
+                      <h6 style={{ marginTop: "10px" }}>{
+                        details?.designation[index]}</h6>
                   </div>
                 ) : (
                   <div

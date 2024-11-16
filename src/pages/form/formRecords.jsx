@@ -92,20 +92,22 @@ const FormRecords = () => {
             </IconButton>
           </a>
 
-          <Tooltip title="View Details">
-            <IconButton>
-              <DigitalSignModel
-                formId={params.row?._id}
-                open={open}
-                setOpen={setOpen}
-                imageURL={imageURL}
-                setImageURL={setImageURL}
-                signatures={signatures}
-                setSignatures={setSignatures}
-                sigCanvas={sigCanvas}
-              />
-            </IconButton>
-          </Tooltip>
+          {params.row?.signature?.length < 0 && (
+            <Tooltip title="View Details">
+              <IconButton>
+                <DigitalSignModel
+                  formId={params.row?._id}
+                  open={open}
+                  setOpen={setOpen}
+                  imageURL={imageURL}
+                  setImageURL={setImageURL}
+                  signatures={signatures}
+                  setSignatures={setSignatures}
+                  sigCanvas={sigCanvas}
+                />
+              </IconButton>
+            </Tooltip>
+          )}
         </div>
       ),
     },
