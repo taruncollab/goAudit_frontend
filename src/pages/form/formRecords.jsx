@@ -41,8 +41,8 @@ const FormRecords = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [open, setOpen] = useState(false);
-  const [imageURL, setImageURL] = useState([null, null, null]);
-  const [signatures, setSignatures] = useState([null, null, null]);
+  const [imageURL, setImageURL] = useState([]);
+  const [signatures, setSignatures] = useState([]);
   const sigCanvas = [useRef(), useRef(), useRef()];
 
   //Effect Zone---------------------
@@ -93,9 +93,7 @@ const FormRecords = () => {
           </a>
 
           <Tooltip title="View Details">
-            <IconButton
-            // onClick={() => navigate(params.row?._id)}
-            >
+            <IconButton>
               <DigitalSignModel
                 formId={params.row?._id}
                 open={open}
