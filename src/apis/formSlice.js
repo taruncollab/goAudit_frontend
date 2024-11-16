@@ -70,6 +70,25 @@ export const generateAuditReportPdF = createAsyncThunk(
   }
 );
 
+export const updateFormnById = createAsyncThunk(
+  "updateFormnById",
+  async (data, { rejectWithValue }) => {
+
+
+    console.log(data)
+    try {
+      const res = await axios.put(
+        `${import.meta.env.VITE_BACKEND_PATH}/form/updateformbyid/${data?.formId}`,
+        data,
+        apiHeader
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 const formSliceDetails = createSlice({
   name: "formSliceDetails",
   initialState: {
@@ -119,6 +138,20 @@ const formSliceDetails = createSlice({
         state.error = null;
       })
       .addCase(getFormbyLocId.rejected, (state, action) => {
+        state.formLoading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(updateFormnById.pending, (state) => {
+        state.formLoading = true;
+      })
+      .addCase(updateFormnById.fulfilled, (state, action) => {
+        state.formLoading = false;
+        state.form = state.form.map((item) =>
+          item._id === action.payload.data._id ? action.payload.data : item
+        );
+      })
+      .addCase(updateFormnById.rejected, (state, action) => {
         state.formLoading = false;
         state.error = action.payload;
       });

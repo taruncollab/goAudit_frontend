@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import formCSS from "./form.module.scss";
@@ -23,6 +23,8 @@ import {
   RemoveRedEye as RemoveRedEyeIcon,
 } from "@mui/icons-material";
 import DownloadIcon from "@mui/icons-material/Download";
+import BrushIcon from "@mui/icons-material/Brush";
+import DigitalSignModel from "./DigitalSign";
 
 const FormRecords = () => {
   const navigate = useNavigate();
@@ -37,6 +39,11 @@ const FormRecords = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [open, setOpen] = useState(false);
+  const [imageURL, setImageURL] = useState([null, null, null]);
+  const [signatures, setSignatures] = useState([null, null, null]);
+  const sigCanvas = [useRef(), useRef(), useRef()];
 
   //Effect Zone---------------------
 
@@ -63,7 +70,7 @@ const FormRecords = () => {
       align: "center",
       disableColumnMenu: true,
       sortable: false,
-      width: 100,
+      width: 250,
       renderCell: (params) => (
         <div>
           <Tooltip title="View Details">
@@ -84,6 +91,23 @@ const FormRecords = () => {
               <DownloadIcon className={formCSS.infoBtn} />
             </IconButton>
           </a>
+
+          <Tooltip title="View Details">
+            <IconButton
+            // onClick={() => navigate(params.row?._id)}
+            >
+              <DigitalSignModel
+                formId={params.row?._id}
+                open={open}
+                setOpen={setOpen}
+                imageURL={imageURL}
+                setImageURL={setImageURL}
+                signatures={signatures}
+                setSignatures={setSignatures}
+                sigCanvas={sigCanvas}
+              />
+            </IconButton>
+          </Tooltip>
         </div>
       ),
     },

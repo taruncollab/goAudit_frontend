@@ -60,10 +60,10 @@ export default function Form() {
     ],
     // score: 0,
   });
-  const [open, setOpen] = useState(false);
-  const [imageURL, setImageURL] = useState([null, null, null]);
-  const [signatures, setSignatures] = useState([null, null, null]);
-  const sigCanvas = [useRef(), useRef(), useRef()];
+  // const [open, setOpen] = useState(false);
+  // const [imageURL, setImageURL] = useState([null, null, null]);
+  // const [signatures, setSignatures] = useState([null, null, null]);
+  // const sigCanvas = [useRef(), useRef(), useRef()];
 
   //Effect Zone---------------------
   useEffect(() => {
@@ -199,8 +199,8 @@ export default function Form() {
       locId: values?.locId?._id,
       categoryId: values?.categoryId?._id,
       createdBy: auth?._id,
-      signatures: signatures,
-      cameraImages: imageURL,
+      // signatures: signatures,
+      // cameraImages: imageURL,
     };
 
     const res = await dispatch(addForm(finalData));
@@ -319,8 +319,6 @@ export default function Form() {
           {values &&
             values?.formData?.map((data, index) => {
               const inputName = `formData${[index]}.answer`;
-              const attachment = `formData${[index]}.attachment`;
-
               const remarkName = `formData${[index]}.remark`;
               return (
                 <>
@@ -568,55 +566,7 @@ export default function Form() {
                           </>
                         )}
                       </Grid>
-
-                      {/* Open Camera--------- */}
-
-                      {/* <Button
-                      size="small"
-                      className={formCSS.remarkBtn}
-                      onClick={() => toggleCamera(index)}
-                    >
-                      {openCameraIndex[index] ? "Close Camera" : "Open Camera"}
-                    </Button>
-
-                    {openCameraIndex[index] && (
-                      <Camera
-                        index={index}
-                        photos={photos}
-                        setPhotos={setPhotos}
-                        videoBlobs={videoBlobs}
-                        setVideoBlobs={setVideoBlobs}
-                      />
-                    )} */}
-
-                      {/* Open Camera--------- */}
-
-                      {/* <Grid item xs={12} md={2} ml={{ xs: 0, md: 0 }}>
-                      <Button
-                        size="small"
-                        className={formCSS.remarkBtn}
-                        onClick={() =>
-                          setOpenRemarkIndex([index, !openRemarkIndex[1]])
-                        }
-                      >
-                        <NoteAltIcon sx={{ mr: 1 }} /> Add remarks
-                      </Button>
-                    </Grid> */}
                     </Grid>
-
-                    {/* {openRemarkIndex[1] && openRemarkIndex[0] === index && (
-                    <Grid ml={3} mr={3} mt={1} mb={1}>
-                      <TextField
-                        className="my-2"
-                        type="text"
-                        label="Remarks"
-                        size="small"
-                        fullWidth
-                        name={remarkName}
-                        onChange={(e) => handleRemark(e, index)}
-                      />
-                    </Grid>
-                  )} */}
 
                     <Grid ml={2} mr={3} mt={1} mb={1}>
                       <TextField
@@ -636,7 +586,7 @@ export default function Form() {
 
           {/* Signature Part */}
 
-          <Grid
+          {/* <Grid
             ml={1}
             mr={3}
             mt={3}
@@ -652,9 +602,9 @@ export default function Form() {
               setSignatures={setSignatures}
               sigCanvas={sigCanvas}
             />
-          </Grid>
+          </Grid> */}
 
-          <Grid
+          {/* <Grid
             ml={1}
             mr={3}
             mt={3}
@@ -680,7 +630,6 @@ export default function Form() {
                       borderRadius: "10px",
                     }}
                   >
-                    {/* Displaying photo */}
                     <img
                       src={image}
                       alt={`Person ${index + 1} Photo`}
@@ -720,7 +669,7 @@ export default function Form() {
                 </h6>
               )}
             </div>
-          </Grid>
+          </Grid> */}
 
           <Stack
             gap={2}
