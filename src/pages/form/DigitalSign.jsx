@@ -150,7 +150,7 @@ export default function DigitalSignModel({
           {[0, 1, 2].map((index) => (
             <div key={index} style={{ marginBottom: "20px" }}>
               <h5>
-                {index + 1}. {degisnation[index]}
+                {index + 1}. {designation[index]}
               </h5>
               <TextField
                 fullWidth
