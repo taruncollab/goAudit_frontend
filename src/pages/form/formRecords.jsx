@@ -92,7 +92,7 @@ const FormRecords = () => {
             </IconButton>
           </a>
 
-          {params.row?.signature?.length < 0 && (
+          {params.row?.signatures?.length < 0 && (
             <Tooltip title="View Details">
               <IconButton>
                 <DigitalSignModel

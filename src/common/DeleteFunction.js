@@ -14,7 +14,7 @@ const useHandleDelete = (apiAction, name) => {
       text: `You won't be able to revert this ${name}!`,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: `Yes, delete it ${name}!`,
+      confirmButtonText: `Yes, delete this ${name}!`,
       cancelButtonText: "No, cancel!",
       reverseButtons: true,
     }).then((result) => {

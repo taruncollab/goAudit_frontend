@@ -145,7 +145,7 @@ const ShowForms = () => {
       renderCell: (params) => {
         return (
           <Chip
-            label={params?.row?.locId.locName || "No Location"}
+            label={params?.row?.locId?.locName || "No Location"}
             variant="outlined"
             sx={{ borderColor: "#0672BC", color: "#0672BC" }}
             icon={<LocationOnIcon />}
