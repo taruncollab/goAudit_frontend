@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import formCSS from "./form.module.scss";
-import { generateAuditReportPdF, getForms } from "../../apis/formSlice";
+import { getForms } from "../../apis/formSlice";
 import LoadingTable from "../../common/loadingTable";
 import {
   CorporateFare as CorporateFareIcon,
@@ -23,7 +23,6 @@ import {
   RemoveRedEye as RemoveRedEyeIcon,
 } from "@mui/icons-material";
 import DownloadIcon from "@mui/icons-material/Download";
-import BrushIcon from "@mui/icons-material/Brush";
 import DigitalSignModel from "./DigitalSign";
 
 const FormRecords = () => {
@@ -92,7 +91,7 @@ const FormRecords = () => {
             </IconButton>
           </a>
 
-          {params.row?.signatures?.length < 0 && (
+          {params.row?.signatures?.length <= 0 && (
             <Tooltip title="View Details">
               <IconButton>
                 <DigitalSignModel
