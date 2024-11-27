@@ -27,7 +27,7 @@ export const getForms = createAsyncThunk(
           import.meta.env.VITE_BACKEND_PATH
         }/form/getforms?page=${page}&limit=${limit}`,
         { search },
-        apiHeader
+        apiHeader()
       );
       return res.data;
     } catch (error) {
@@ -73,12 +73,11 @@ export const generateAuditReportPdF = createAsyncThunk(
 export const updateFormnById = createAsyncThunk(
   "updateFormnById",
   async (data, { rejectWithValue }) => {
-
-
-    console.log(data)
     try {
       const res = await axios.put(
-        `${import.meta.env.VITE_BACKEND_PATH}/form/updateformbyid/${data?.formId}`,
+        `${import.meta.env.VITE_BACKEND_PATH}/form/updateformbyid/${
+          data?.formId
+        }`,
         data,
         apiHeader
       );
