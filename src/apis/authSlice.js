@@ -43,6 +43,11 @@ export const logIn = createAsyncThunk(
         data,
         apiHeader
       );
+
+      if (res?.data?.data) {
+        localStorage.setItem("user", JSON.stringify(res.data?.data));
+      }
+
       if (res?.data?.token) {
         localStorage.setItem("userToken", res.data?.token);
       }
@@ -79,6 +84,42 @@ export const getUsers = createAsyncThunk(
     try {
       const res = await axios.get(
         `${import.meta.env.VITE_BACKEND_PATH}/auth/getusers`,
+        {
+          params: data,
+        },
+        apiHeader
+      );
+
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const createUser = createAsyncThunk(
+  "createUser",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_PATH}/auth/createUser`,
+        data,
+        apiHeader
+      );
+
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const updateUser = createAsyncThunk(
+  "updateUser",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axios.put(
+        `${import.meta.env.VITE_BACKEND_PATH}/auth/updateuserbyid/${data._id}`,
         data,
         apiHeader
       );

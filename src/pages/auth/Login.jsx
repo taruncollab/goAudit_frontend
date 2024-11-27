@@ -1,15 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  Card,
-  CardContent,
-  Typography,
   Grid,
   TextField,
-  Stack,
   Button,
   Box,
-  FormControl,
-  Checkbox,
   InputLabel,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
@@ -71,7 +65,7 @@ const Login = () => {
     const res = await dispatch(logIn({ ...data, otp: otp }));
 
     if (res.type.includes("fulfilled")) {
-      navigate("/");
+      navigate("/dashboard");
       toast.success(res.payload.response?.data?.message);
     } else {
       toast.warning(res.payload.response?.data?.message);

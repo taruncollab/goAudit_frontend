@@ -27,7 +27,7 @@ export const getQuestions = createAsyncThunk(
           import.meta.env.VITE_BACKEND_PATH
         }/question/getquestions?page=${page}&limit=${limit}`,
         { search },
-        apiHeader
+        apiHeader()
       );
       return res.data;
     } catch (error) {

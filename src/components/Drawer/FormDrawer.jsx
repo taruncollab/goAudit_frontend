@@ -41,8 +41,12 @@ export default function FormDrawer(props) {
     setSelectedValue,
     selectedValue,
     loading,
+    locSelectedValue,
+    setLocSelectedValue,
+    handleLocInputChange,
+    locInputValue,
+    setLocInputValue,
   } = props;
-
 
   const handleImageRemove = () => {
     setUpload(null);
@@ -114,30 +118,63 @@ export default function FormDrawer(props) {
                           >
                             {data?.title}
                           </InputLabel>
-
-                          <Autocomplete
-                            name={data?.name}
-                            options={data?.options}
-                            getOptionLabel={(option) => option?.label}
-                            value={selectedValue}
-                            onChange={(event, newValue) => {
-                              setSelectedValue(newValue);
-                            }}
-                            inputValue={inputValue}
-                            onInputChange={handleInputChange}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                InputProps={{
-                                  ...params.InputProps,
-                                  endAdornment: (
-                                    <>{params.InputProps.endAdornment}</>
-                                  ),
-                                }}
-                              />
-                            )}
-                          />
+                          {data?.name == "compId" ? (
+                            <Autocomplete
+                              name={data?.name}
+                              options={data?.options}
+                              multiple={data?.mutiple || false}
+                              filterSelectedOptions
+                              getOptionLabel={(option) => option?.label}
+                              value={selectedValue}
+                              onChange={(event, newValue) => {
+                                setSelectedValue(newValue);
+                              }}
+                              inputValue={inputValue}
+                              onInputChange={handleInputChange}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  // onChange={(e) =>
+                                  //   setInputValue(e.target.value)
+                                  // }
+                                  InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                      <>{params.InputProps.endAdornment}</>
+                                    ),
+                                  }}
+                                />
+                              )}
+                            />
+                          ) : (
+                            <Autocomplete
+                              name={data?.name}
+                              options={data?.options}
+                              multiple={data?.mutiple || false}
+                              filterSelectedOptions
+                              getOptionLabel={(option) => option?.label}
+                              value={locSelectedValue}
+                              onChange={(event, newValue) => {
+                                setLocSelectedValue(newValue);
+                              }}
+                              inputValue={locInputValue}
+                              onInputChange={handleLocInputChange}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  // onChange={(e) =>
+                                  //   setLocInputValue(e.target.value)
+                                  // }
+                                  InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                      <>{params.InputProps.endAdornment}</>
+                                    ),
+                                  }}
+                                />
+                              )}
+                            />
+                          )}
 
                           {checkData && (
                             <FormHelperText error>
