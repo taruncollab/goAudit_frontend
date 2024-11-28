@@ -8,38 +8,38 @@ import { getUserByToken, getUsers } from "./apis/authSlice";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getDashboardCount } from "./apis/dashboardSlice";
-import Layout from "../src/Layout/Layout";
+import Layout from "./Layout/Layout";
 import { RoutesArray } from "./common/utils";
 import ProtectedRoute from "./Routes/PrivateRoute";
 import PublicRoute from "./Routes/PublicRoute";
 import Dashboard from "./pages/dashboard/Dashboard";
+import NotFound from "./pages/404/404";
 
 function App() {
   const dispatch = useDispatch();
 
-  const [expire, setExpire] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { auth } = useSelector((state) => state.authData);
 
   useEffect(() => {
-    dispatch(getUsers());
-    dispatch(getDashboardCount());
+    const initializeApp = async () => {
+      await dispatch(getUsers());
+      await dispatch(getDashboardCount());
 
-    const checkToken = async () => {
       const res = await dispatch(getUserByToken());
       if (res?.type?.includes("rejected")) {
         localStorage.removeItem("userToken");
-        setExpire(true);
       }
+      setLoading(false); // Set loading to false after initialization
     };
 
-    checkToken();
-  }, []);
+    initializeApp();
+  }, [dispatch]);
 
-  useEffect(() => {
-    if (expire) {
-      <Navigate to={"/login"} />;
-    }
-  }, [expire]);
+  // Show a loading screen until app initialization is complete
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
@@ -62,7 +62,8 @@ function App() {
               </PublicRoute>
             }
           />
-          <Route
+
+          {/* <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
@@ -71,8 +72,9 @@ function App() {
                 </Layout>
               </ProtectedRoute>
             }
-          />
+          /> */}
 
+          {/* Dynamic Routes */}
           {RoutesArray &&
             RoutesArray.map((item, index) => (
               <Route
@@ -87,6 +89,13 @@ function App() {
                 }
               />
             ))}
+
+          <Route
+            path="/"
+            element={<Navigate to={auth ? "/dashboard" : "/login"} />}
+          />
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </>

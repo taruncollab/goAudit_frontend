@@ -1,0 +1,64 @@
+@mixin respond($breakpoint) {
+  @if $breakpoint == phone {
+    @media (max-width: 37.5em) {
+      @content;
+    } //600px
+  }
+  @if $breakpoint == tab-port {
+    @media (max-width: 52.25em) {
+      @content;
+    } //900px
+  }
+  @if $breakpoint == tab-land {
+    @media (max-width: 75em) {
+      @content;
+    } //1200px
+  }
+  @if $breakpoint == big-desktop {
+    @media (min-width: 112.5em) {
+      @content;
+    } //1800px
+  }
+}
+
+.display {
+  margin-top: 10rem;
+  margin-left: 5rem;
+  margin-right: 5rem;
+  margin-bottom: 5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(32.5rem, 1fr));
+
+  &__img > img {
+    width: 100%;
+    // margin-bottom: 10rem;
+  }
+
+  &__content {
+    margin-left: 5rem;
+
+    @include respond(phone) {
+      margin-left: 0;
+    }
+
+    &--info {
+      font-size: 6rem;
+      line-height: 1.2;
+
+      @include respond(phone) {
+        font-size: 4.8rem;
+      }
+    }
+    &--text {
+      margin-top: 1.5rem;
+      font-family: "Space Mono", monospace;
+      font-size: 2rem;
+      font-weight: 400;
+      line-height: 1.7;
+      width: 40rem;
+      @include respond(phone) {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
