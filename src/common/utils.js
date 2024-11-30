@@ -148,3 +148,22 @@ export const RoutesArray = [
     component: CompareScore,
   },
 ];
+
+export const options = [
+  { label: "Yes", value: "yes" },
+  { label: "No", value: "no" },
+  { label: "Not Sure", value: "not sure" },
+];
+
+export const downloadReportExcel = (jsonData) => {
+  let downloadData = [];
+  jsonData.forEach((element) => {
+    let innerData = {
+      "Form Title": element && element.title,
+      Question: element && element.formData && element.formData.text,
+      Answer: element && element.formData && element.formData.answer[0],
+    };
+    downloadData.push(innerData);
+  });
+  return downloadData;
+};

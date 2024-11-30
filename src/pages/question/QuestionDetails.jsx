@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import { Button, Grid, Stack, Tooltip, Typography } from "@mui/material";
 import questionCSS from "./question.module.scss";
-import { getQuestions } from "../../apis/questionSlice";
 import {
   AdsClick as AdsClickIcon,
   Edit as EditIcon,
@@ -18,7 +17,6 @@ import {
 const QuestionDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { question } = useSelector((state) => state.questionData);
 
   //State Zone----------------------------------------

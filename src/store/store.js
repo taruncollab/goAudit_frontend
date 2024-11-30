@@ -6,6 +6,7 @@ import categorySlice from "../apis/categorySlice";
 import questionSlice from "../apis/questionSlice";
 import formSlice from "../apis/formSlice";
 import dashboardSliceDetails from "../apis/dashboardSlice";
+import optionSliceDetails from "../apis/optionSlice";
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     questionData: questionSlice,
     formData: formSlice,
     dashboardData: dashboardSliceDetails,
+    optionData: optionSliceDetails,
   },
 });
 

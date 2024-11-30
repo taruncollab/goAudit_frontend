@@ -12,7 +12,6 @@ import Layout from "./Layout/Layout";
 import { RoutesArray } from "./common/utils";
 import ProtectedRoute from "./Routes/PrivateRoute";
 import PublicRoute from "./Routes/PublicRoute";
-import Dashboard from "./pages/dashboard/Dashboard";
 import NotFound from "./pages/404/404";
 
 function App() {
@@ -62,17 +61,6 @@ function App() {
               </PublicRoute>
             }
           />
-
-          {/* <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Dashboard />
-                </Layout>
-              </ProtectedRoute>
-            }
-          /> */}
 
           {/* Dynamic Routes */}
           {RoutesArray &&

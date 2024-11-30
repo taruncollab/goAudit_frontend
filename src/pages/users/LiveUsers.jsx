@@ -17,7 +17,6 @@ import {
 import {
   deleteLocationbyid,
   getLocations,
-  updateLocationbyid,
 } from "../../apis/locationSlice";
 import locationCSS from "./users.module.scss";
 import FormDrawer from "../../components/Drawer/FormDrawer";

@@ -23,7 +23,7 @@ import {
 const Company = () => {
   const dispatch = useDispatch();
   const { auth } = useSelector((state) => state.authData);
-  const { comp, totalPages, compLoading } = useSelector(
+  const { compLoading } = useSelector(
     (state) => state.companyData
   );
 

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { Button, Grid, Stack, Tooltip, Typography } from "@mui/material";
+import { Button, Grid, Tooltip, Typography } from "@mui/material";
 import formCSS from "./form.module.scss";
 import { getForms } from "../../apis/formSlice";
 import {
@@ -11,11 +11,9 @@ import {
   AdsClick as AdsClickIcon,
   FormatShapes as FormatShapesIcon,
   Style as StyleIcon,
-  Attachment as AttachmentIcon,
   NoteAlt as NoteAltIcon,
   Draw as DrawIcon,
 } from "@mui/icons-material";
-import { Download as DownloadIcon } from "@mui/icons-material"; // Importing Material UI Download icon
 import { splitOnLastDot } from "../../common/common";
 
 const FormDetails = () => {

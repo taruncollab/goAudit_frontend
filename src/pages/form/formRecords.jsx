@@ -1,5 +1,8 @@
+import { useMemo } from "react";
 import {
+  Autocomplete,
   Box,
+  Button,
   Chip,
   Grid,
   IconButton,
@@ -13,7 +16,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import formCSS from "./form.module.scss";
-import { getForms } from "../../apis/formSlice";
+import { generateFormReportExcel, getForms } from "../../apis/formSlice";
 import LoadingTable from "../../common/loadingTable";
 import {
   CorporateFare as CorporateFareIcon,
@@ -24,6 +27,10 @@ import {
 } from "@mui/icons-material";
 import DownloadIcon from "@mui/icons-material/Download";
 import DigitalSignModel from "./DigitalSign";
+import { downloadReportExcel } from "../../common/utils";
+import * as XLSX from "xlsx";
+import _ from "lodash";
+import { searchOptions } from "../../apis/optionSlice";
 
 const FormRecords = () => {
   const navigate = useNavigate();
@@ -37,11 +44,14 @@ const FormRecords = () => {
   //State Zone---------------------
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [inputValue, setInputValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const [open, setOpen] = useState(false);
   const [imageURL, setImageURL] = useState([]);
   const [signatures, setSignatures] = useState([]);
+  const [options, setOptions] = useState([]);
+  const [queOption, setQueOption] = useState(null);
   const sigCanvas = [useRef(), useRef(), useRef()];
 
   //Effect Zone---------------------
@@ -220,6 +230,63 @@ const FormRecords = () => {
     },
   ];
 
+  const handleExcelDownload = async () => {
+    let response = await dispatch(
+      generateFormReportExcel({ option: queOption })
+    );
+
+    let excelData = response && response.payload && response.payload.data;
+
+    if (excelData.length === 0) {
+      alert("No data to export.");
+      return;
+    }
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(downloadReportExcel(excelData));
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    const wbBinary = XLSX.write(wb, { type: "binary" });
+    const arrayBuffer = new Uint8Array(wbBinary.length);
+    for (let i = 0; i < wbBinary.length; i++) {
+      arrayBuffer[i] = wbBinary.charCodeAt(i);
+    }
+
+    const blob = new Blob([arrayBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Form Record Data.xlsx";
+    link.click();
+  };
+
+  const fetchOptions = useMemo(
+    () =>
+      _.debounce(async (query) => {
+        try {
+          const response = await dispatch(searchOptions({ search: query }));
+
+          setOptions(
+            response &&
+              response.payload &&
+              response.payload.data.map((item) => ({
+                label: item.text,
+                value: item?._id,
+              }))
+          );
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }, 1000),
+    []
+  );
+
+  useEffect(() => {
+    fetchOptions(inputValue);
+  }, [inputValue]);
+
   return (
     <>
       <Grid container spacing={2}>
@@ -247,6 +314,30 @@ const FormRecords = () => {
             }}
           />
         </Grid>
+
+        <Grid item xs={12} sm={6} md={4} mt={2} ml={2} mr={2}>
+          <Autocomplete
+            disablePortal
+            size="small"
+            className={formCSS.searchBar}
+            options={options}
+            onInputChange={(event, newInputValue) => {
+              setInputValue(newInputValue);
+            }}
+            onChange={(e, newValue) => setQueOption(newValue)}
+            renderInput={(params) => (
+              <TextField {...params} label="Select Answer Type" />
+            )}
+          />
+        </Grid>
+
+        {queOption !== null && (
+          <Grid item xs={12} sm={6} md={4} mt={2} ml={2} mr={2}>
+            <Button variant="contained" onClick={handleExcelDownload}>
+              Download Excel
+            </Button>
+          </Grid>
+        )}
 
         <Grid item xs={11.5} mt={3} ml={2} mr={2}>
           {formLoading ? (

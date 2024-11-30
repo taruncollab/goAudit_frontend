@@ -2,17 +2,13 @@ import {
   Autocomplete,
   Button,
   Card,
-  CardActions,
   Grid,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import Checkbox from "@mui/material/Checkbox";
 import { getFormbyLocId } from "../../apis/formSlice";
 import compareCSS from "./compare.module.scss";

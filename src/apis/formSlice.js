@@ -88,6 +88,22 @@ export const updateFormnById = createAsyncThunk(
   }
 );
 
+export const generateFormReportExcel = createAsyncThunk(
+  "generateFormReportExcel",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_PATH}/form/generateFormReportExcel`,
+        { params: data },
+        apiHeader()
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 const formSliceDetails = createSlice({
   name: "formSliceDetails",
   initialState: {

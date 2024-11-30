@@ -31,7 +31,7 @@ const Dashboard = () => {
   } = useSelector((state) => state.dashboardData);
 
   const cards = [
-    { title: "Users", count: userCount, img: userBlack, path: "/" },
+    { title: "Users", count: userCount, img: userBlack, path: "/users" },
     {
       title: "Companies",
       count: companyCount,

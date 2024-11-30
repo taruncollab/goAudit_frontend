@@ -21,13 +21,10 @@ import { addForm } from "../../apis/formSlice";
 import { getQuestions } from "../../apis/questionSlice";
 import Swal from "sweetalert2";
 import {
-  NoteAlt as NoteAltIcon,
   Assignment as AssignmentIcon,
-  ImageNotSupported,
 } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
-import DigitalSignModel from "./DigitalSign";
 
 export default function Form() {
   const navigate = useNavigate();
