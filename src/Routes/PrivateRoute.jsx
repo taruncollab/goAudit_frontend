@@ -8,9 +8,9 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  const allowedPathsForU = ["/showforms", "/formrecords"];
+  const allowedPathsForU = ["/showforms", "/formrecords", "/draftform"];
 
-  const dynamicRoutesForU = ["/fillform/:id?", "/formdetails/:id"];
+  const dynamicRoutesForU = ["/fillform/:id?", "/formdetails/:id", "/draftfillform/:id?"];
 
   const isAllowed =
     allowedPathsForU.includes(location.pathname) ||

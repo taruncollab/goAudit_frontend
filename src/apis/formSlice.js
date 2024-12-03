@@ -104,10 +104,45 @@ export const generateFormReportExcel = createAsyncThunk(
   }
 );
 
+export const addDraft = createAsyncThunk(
+  "addDraft",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_PATH}/form/adddraft`,
+        data,
+        apiHeader
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const getDraftForms = createAsyncThunk(
+  "getDraftForms",
+  async ({ page = 1, limit = 5, search = "" }, { rejectWithValue }) => {
+    try {
+      const res = await axios.post(
+        `${
+          import.meta.env.VITE_BACKEND_PATH
+        }/form/getdraftforms?page=${page}&limit=${limit}`,
+        { search },
+        apiHeader()
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 const formSliceDetails = createSlice({
   name: "formSliceDetails",
   initialState: {
     form: [],
+    draftForm: [],
     formLoading: false,
     error: null,
     totalPages: 0,
@@ -125,6 +160,21 @@ const formSliceDetails = createSlice({
         state.error = null;
       })
       .addCase(addForm.rejected, (state, action) => {
+        state.formLoading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(getDraftForms.pending, (state) => {
+        state.formLoading = true;
+      })
+      .addCase(getDraftForms.fulfilled, (state, action) => {
+        state.formLoading = false;
+        state.draftForm = action.payload.data;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
+        state.error = null;
+      })
+      .addCase(getDraftForms.rejected, (state, action) => {
         state.formLoading = false;
         state.error = action.payload;
       })

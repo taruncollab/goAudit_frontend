@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import {
   Button,
   Checkbox,
@@ -17,12 +17,15 @@ import {
 } from "@mui/material";
 import { TextareaAutosize } from "@mui/base/TextareaAutosize";
 import formCSS from "./form.module.scss";
-import { addForm } from "../../apis/formSlice";
+import {
+  addDraft,
+  addForm,
+  getDraftForms,
+  updateFormnById,
+} from "../../apis/formSlice";
 import { getQuestions } from "../../apis/questionSlice";
 import Swal from "sweetalert2";
-import {
-  Assignment as AssignmentIcon,
-} from "@mui/icons-material";
+import { Assignment as AssignmentIcon } from "@mui/icons-material";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 
@@ -30,10 +33,13 @@ export default function Form() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams();
+  const location = useLocation();
 
   const { auth } = useSelector((state) => state.authData);
   const { question } = useSelector((state) => state.questionData);
-  const { formLoading } = useSelector((state) => state.formData);
+  const { draftForm, formLoading } = useSelector((state) => state.formData);
+
+  let draftRoute = location.pathname.includes("draftfillform");
 
   // State Zone---------------------
   const fileInputRefs = useRef([]);
@@ -55,22 +61,21 @@ export default function Form() {
         remark: "",
       },
     ],
-    // score: 0,
   });
-  // const [open, setOpen] = useState(false);
-  // const [imageURL, setImageURL] = useState([null, null, null]);
-  // const [signatures, setSignatures] = useState([null, null, null]);
-  // const sigCanvas = [useRef(), useRef(), useRef()];
 
   //Effect Zone---------------------
   useEffect(() => {
-    if (id) {
+    if (id && draftRoute) {
+      dispatch(getDraftForms({}));
+    } else {
       dispatch(getQuestions({}));
     }
-  }, [id]);
+  }, [id, draftRoute]);
 
   useEffect(() => {
-    const data = question && question?.find((f) => f?._id == id);
+    const data = draftRoute
+      ? draftForm && draftForm?.find((f) => f?._id == id)
+      : question && question?.find((f) => f?._id == id);
 
     const newValues = {
       ...values,
@@ -78,21 +83,33 @@ export default function Form() {
       locId: data?.locId || "",
       categoryId: data?.categoryId || "",
       title: data?.title || "",
-      formData: data?.questions?.map((q) => ({
-        text: q?.question || "",
-        type: q?.type || "",
-        options: q?.options || "",
-        prefAns: q?.prefAns || "",
-        answer: [],
-        attachment: [],
-        showAttachment: [],
-        remark: "",
-      })),
-      // score: 0,
+      formData: data?.questions
+        ? data?.questions?.map((q) => ({
+            text: q?.question || "",
+            type: q?.type || "",
+            options: q?.options || "",
+            prefAns: q?.prefAns || "",
+            answer: [],
+            attachment: [],
+            showAttachment: [],
+            remark: "",
+          }))
+        : data?.formData?.map((q) => ({
+            text: q?.text || "",
+            type: q?.type || "",
+            options: q?.options || "",
+            prefAns: q?.prefAns || "",
+            answer: q.answer || [],
+            attachment: q.attachment || [],
+            showAttachment: q.attachment || [],
+            remark: q.remark || "",
+          })),
     };
 
     setValues(newValues);
-  }, [question]);
+  }, [location, id]);
+
+  console.log(values, "values========");
 
   // For Radio Button------------------------
 
@@ -188,7 +205,36 @@ export default function Form() {
       return toast.warning("Please Answer All Questions");
     }
 
-    // Upload the file to S3
+    const finalData = {
+      ...values,
+      compId: values?.compId?._id,
+      locId: values?.locId?._id,
+      categoryId: values?.categoryId?._id,
+      createdBy: auth?._id,
+      isDraft: false,
+      formId: id,
+    };
+
+    const res = await dispatch(
+      draftRoute ? updateFormnById(finalData) : addForm(finalData)
+    );
+
+    if (res.type.includes("fulfilled")) {
+      navigate("/formrecords");
+      setValues({});
+      Swal.fire({
+        title: "Success",
+        text: res.payload.message,
+        icon: "success",
+        timer: 1000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+    }
+  };
+
+  const handleDraft = async (event) => {
+    event.preventDefault();
 
     const finalData = {
       ...values,
@@ -196,17 +242,16 @@ export default function Form() {
       locId: values?.locId?._id,
       categoryId: values?.categoryId?._id,
       createdBy: auth?._id,
-      // signatures: signatures,
-      // cameraImages: imageURL,
+      isDraft: true,
     };
 
-    const res = await dispatch(addForm(finalData));
+    const res = await dispatch(addDraft(finalData));
 
     if (res.type.includes("fulfilled")) {
-      navigate("/formrecords");
+      navigate("/draftform");
       setValues({});
       Swal.fire({
-        title: "Success",
+        title: "Added to Draft Successfully",
         text: res.payload.message,
         icon: "success",
         timer: 1000,
@@ -388,7 +433,7 @@ export default function Form() {
                           <RadioGroup
                             aria-label="options"
                             name={inputName}
-                            value={values.formData[index].selectedOption}
+                            value={values.formData[index]?.answer[0]}
                             onChange={(e) => handleChange(e, index)}
                           >
                             <Stack direction={"row"} gap={2}>
@@ -675,6 +720,16 @@ export default function Form() {
             mt={3}
             mb={2}
           >
+            {!draftRoute && (
+              <Button
+                variant="outlined"
+                sx={{ borderRadius: "99px" }}
+                onClick={handleDraft}
+              >
+                Draft
+              </Button>
+            )}
+
             {formLoading && formLoading ? (
               <>
                 <Button className={formCSS.submitBtn}>

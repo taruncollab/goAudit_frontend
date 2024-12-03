@@ -27,6 +27,7 @@ import Form from "../pages/form/Form";
 import FormRecords from "../pages/form/formRecords";
 import FormDetails from "../pages/form/FormDetails";
 import CompareScore from "../pages/Compare/CompareScore";
+import DraftFormRecords from "../pages/form/DraftFormRecords";
 
 export const SidebarArray = [
   {
@@ -77,6 +78,13 @@ export const SidebarArray = [
     role: ["A", "U"],
     whiteIcon: formWhite,
     blackIcon: formBlack,
+  },
+  {
+    name: "Draft Form",
+    link: "/draftform",
+    role: ["A", "U"],
+    whiteIcon: formRecordWhite,
+    blackIcon: formRecordBlack,
   },
   {
     name: "Form Records",
@@ -134,6 +142,14 @@ export const RoutesArray = [
   {
     link: "/fillform/:id?",
     component: Form,
+  },
+  {
+    link: "/draftfillform/:id?",
+    component: Form,
+  },
+  {
+    link: "/draftform",
+    component: DraftFormRecords,
   },
   {
     link: "/formrecords",
